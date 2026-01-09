@@ -1,0 +1,271 @@
+# Specification projet – Web App Dolce Pizza Marseille
+
+## 1. Contexte & Vision
+
+**Contexte :**  
+Dolce Pizza Marseille est une pizzeria située au 24 boulevard Notre Dame, 13006 Marseille, spécialisée dans la livraison de pizzas au feu de bois (1er au 10e arrondissements). Le site actuel (https://dolce-pizza-marseille.com/) présente la pizzeria, la carte, les catégories de pizzas, les offres, un blog et des informations de contact.
+
+Le site est orienté "présentation + infos", avec un design correct mais peu adapté à une **web app de commande moderne** et vraiment soignée sur le plan UI/UX.
+
+**Vision du projet :**  
+Créer une **web app de commande** moderne, claire et chaleureuse, inspirée du contenu de Dolce Pizza (pizzas, descriptions, offres, photos, identité), mais avec une **nouvelle interface** plus esthétique et plus adaptée à une utilisation mobile.
+
+La web app doit permettre :
+- De parcourir la **carte** (pizzas, boissons, desserts, offres).
+- D’ajouter des produits à un **panier**.
+- De choisir un mode de commande :
+  - **À emporter**
+  - **Livraison** (zones déjà indiquées sur le site).
+- De passer une **commande complète** (sans paiement en ligne dans un premier temps).
+
+## 2. Public cible & usages
+
+**Utilisateurs principaux :**
+
+1. **Clients particuliers**
+   - Habitants des 1er au 10e arrondissements de Marseille.
+   - Souhaitent commander une pizza rapidement :
+     - à emporter
+     - à livrer
+
+2. **Pizzeria / équipe Dolce Pizza** (version ultérieure)
+   - Consultation des commandes.
+   - Gestion de l’état des commandes (en préparation, prête, livrée).
+   - Cette partie back-office est hors périmètre V1.
+
+**Contexte d’utilisation :**
+- Principalement **smartphone** (commande rapide).
+- Utilisation secondaire sur desktop (depuis le travail ou la maison).
+
+## 3. Objectifs du projet
+
+### Objectifs fonctionnels (V1)
+
+- Offrir une **expérience de commande fluide** avec peu d’étapes.
+- Mettre en avant :
+  - les **catégories de pizzas** (Base sauce, Base crème, Gourmets, Avec viande, Chaussons, etc.)
+  - les **boissons & desserts**
+  - les **offres spéciales** (ex : 3 pizzas achetées = 4e offerte / boisson).
+- Permettre aux clients de :
+  - parcourir la carte
+  - composer un panier
+  - choisir emporter / livraison
+  - renseigner leurs infos
+  - confirmer la commande.
+
+### Objectifs UX / UI
+
+- Créer un **design clair**, chaleureux, inspiré d’une pizzeria artisanale :
+  - Couleurs : crème, rouge brique, vert “basilic”, blanc.
+  - Ambiance conviviale, qualitative, artisanale.
+- **Conserver le logo Dolce Pizza** et harmoniser la charte autour de lui.
+- Améliorer **fortement** le design par rapport au site existant :
+  - nouvelles typographies
+  - nouveaux espacements
+  - nouvelles cartes produits
+- **Ne pas créer un design system complet** dans cette phase. Simplement :
+  - une mise en page propre,
+  - une palette cohérente,
+  - des typographies lisibles,
+  - des composants esthétiques basiques.
+
+## 4. Périmètre fonctionnel – V1
+
+### 4.1. Pages à implémenter
+
+- `/` – **Accueil**
+  - Présentation rapide de Dolce Pizza.
+  - Mise en avant :
+    - “Commandez à emporter”
+    - “Commandez en livraison”
+  - Quelques sections “Pourquoi nous choisir” (ingrédients, cuisson au feu de bois, livraison gratuite, etc.) réutilisées du site.
+
+- `/menu` – **Carte**
+  - Liste des catégories :
+    - Pizzas (avec sous-catégories : Base sauce, Base crème, Gourmets, Avec viande, Chaussons, etc.)
+    - Boissons & Desserts
+    - Éventuellement Offres.
+  - Chaque pizza doit afficher :
+    - Photo (si disponible)
+    - Nom
+    - Ingrédients / description
+    - Prix
+    - Bouton “Ajouter”
+
+- `/panier` – **Panier**
+  - Liste des produits ajoutés.
+  - Possibilité de modifier la **quantité**, supprimer un produit.
+  - Affichage du **total**.
+
+- `/commande/infos` – **Informations client & mode**
+  - Choix :
+    - “À emporter”
+    - “Livraison”
+  - Si “À emporter” :
+    - Champ nom
+    - Champ téléphone
+  - Si “Livraison” :
+    - Nom
+    - Téléphone
+    - Adresse (rue, code postal, ville)
+  - Possibilité de rappeler la zone de livraison (1er au 10e arrondissements).
+
+- `/commande/recap` – **Récapitulatif de la commande**
+  - Liste des produits.
+  - Total.
+  - Mode de commande.
+  - Informations client.
+  - Bouton “Confirmer la commande”.
+
+- `/infos` – **Infos pratiques**
+  - Adresse.
+  - Horaires d’ouverture.
+  - Téléphone.
+  - Email.
+  - Éventuellement un lien vers le blog / FAQ / mentions légales.
+
+### 4.2. Format du menu (UX importante)
+
+Le menu doit être présenté en **liste photo + texte**, type :
+
+- Photo de la pizza à gauche (ou en haut en version mobile simple).
+- À droite :
+  - Nom de la pizza en gras.
+  - Ingrédients en plus petit.
+  - Prix bien visible.
+  - Bouton “Ajouter” (ou icône +).
+
+Ce format doit :
+- être **mobile-first**,  
+- garder une ambiance **artisanale & chaleureuse**,  
+- rester très lisible.
+
+### 4.3. Fonctionnalités clés
+
+- Ajouter un produit au panier.
+- Modifier la quantité.
+- Supprimer un produit.
+- Recalculer automatiquement le total.
+- Choisir le mode (emporter / livraison).
+- Renseigner les informations client.
+- Confirmer la commande sans implémenter de paiement en ligne (paiement en espèce / CB à la livraison ou en retrait).
+
+## 5. Contraintes UX / UI
+
+- **Mobile-first**.
+- Ambiance **pizzeria artisanale chaleureuse** :
+  - Couleurs de base : crème, rouge brique, vert basilic, blanc.
+- **Conserver le logo** actuellement utilisé sur https://dolce-pizza-marseille.com/ et l’intégrer dans le header.
+- Typographies :
+  - une police lisible pour les textes (sans-serif moderne),
+  - éventuellement une police un peu plus “caractère” pour les titres.
+- Ne pas réutiliser les typographies ou le CSS exacts du site si ceux-ci ne sont pas adaptés :
+  - le design doit être une **amélioration nette**.
+
+## 6. Architecture technique souhaitée (côté front)
+
+Sans imposer une techno précise, la web app doit :
+
+- Être structurée par **pages / routes** :
+  - `/`
+  - `/menu`
+  - `/panier`
+  - `/commande/infos`
+  - `/commande/recap`
+  - `/infos`
+
+- Utiliser un **state global** pour gérer le panier et la commande :
+  - liste des items
+  - mode de commande
+  - informations client.
+
+### 6.1. Modèles de données (suggestion)
+
+```ts
+Product {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  category: string; // ex: "Base sauce", "Base crème", "Gourmets", "Boissons", "Desserts"
+  imageUrl?: string;
+}
+ts
+Copier le code
+CartItem {
+  productId: string;
+  name: string;
+  unitPrice: number;
+  quantity: number;
+  subtotal: number;
+}
+ts
+Copier le code
+Order {
+  id: string;
+  items: CartItem[];
+  total: number;
+  mode: "emporter" | "livraison";
+  customer: {
+    name: string;
+    phone: string;
+    address?: {
+      street: string;
+      postalCode: string;
+      city: string;
+    }
+  };
+  createdAt: Date;
+}
+7. Source de données
+La source de vérité pour les produits (pizzas, boissons, desserts) est le contenu actuel du site :
+
+https://dolce-pizza-marseille.com/
+
+L’agent doit :
+
+scrapper les noms de pizzas,
+
+descriptions / ingrédients,
+
+prix,
+
+catégories (notamment les catégories listées dans “Notre carte / Nos pizzas / Nos boissons & desserts”).
+
+Les contenus éditoriaux (à propos, blog, avantages, avis clients) peuvent être utilisés pour enrichir la page d’accueil et la page “Infos”, mais ne sont pas au centre du parcours de commande.
+
+8. Périmètre hors-scope (V1)
+Paiement en ligne (Stripe, etc.) → non implémenté en V1.
+
+Interface back-office pour le staff.
+
+Gestion fine des zones de livraison (1er–10e) → simple mention textuelle pour l’instant.
+
+Système de comptes utilisateurs et historique des commandes (à envisager en V2).
+
+9. Critères de réussite
+La V1 de la web app est considérée comme réussie si :
+
+Un utilisateur peut :
+
+Parcourir la carte.
+
+Ajouter plusieurs pizzas au panier.
+
+Modifier son panier.
+
+Choisir “à emporter” ou “livraison”.
+
+Compléter ses informations.
+
+Confirmer la commande.
+
+L’interface :
+
+est claire et lisible sur mobile,
+
+respecte une ambiance chaleureuse, artisanale,
+
+conserve le logo Dolce Pizza,
+
+améliore visuellement le site actuel (typographies, marges, blocs, cartes).

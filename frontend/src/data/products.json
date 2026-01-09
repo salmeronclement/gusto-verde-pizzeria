@@ -1,0 +1,489 @@
+{
+    "categories": [
+        {
+            "id": "classiques",
+            "name": "Nos classiques",
+            "description": "Les pizzas incontournables"
+        },
+        {
+            "id": "base-sauce",
+            "name": "Nos spécialités base sauce",
+            "description": "Spécialités à la sauce tomate"
+        },
+        {
+            "id": "base-creme",
+            "name": "Nos spécialités base crème",
+            "description": "Spécialités à la crème fraîche"
+        },
+        {
+            "id": "gourmets",
+            "name": "Nos Gourmets",
+            "description": "Pizzas premium avec ingrédients d'exception"
+        },
+        {
+            "id": "chaussons",
+            "name": "Nos chaussons",
+            "description": "Chaussons et calzones"
+        },
+        {
+            "id": "boissons",
+            "name": "Nos boissons",
+            "description": "Boissons fraîches"
+        },
+        {
+            "id": "desserts",
+            "name": "Nos desserts",
+            "description": "Douceurs glacées"
+        }
+    ],
+    "products": [
+        {
+            "id": "fromage",
+            "name": "Fromage",
+            "description": "Sauce tomate, fromage",
+            "price": 10,
+            "category": "classiques",
+            "imageUrl": "/images/pizzas/category-classiques.jpg"
+        },
+        {
+            "id": "anchois",
+            "name": "Anchois",
+            "description": "Sauce tomate, anchois",
+            "price": 9.5,
+            "category": "classiques",
+            "imageUrl": "/images/pizzas/category-classiques.jpg"
+        },
+        {
+            "id": "mozzarella",
+            "name": "Mozzarella",
+            "description": "Sauce tomate, mozzarella",
+            "price": 11,
+            "category": "classiques",
+            "imageUrl": "/images/pizzas/category-classiques.jpg"
+        },
+        {
+            "id": "fruits-mer",
+            "name": "Fruits de mer",
+            "description": "Sauce tomate, calamars, supions, crevettes, moules, fromage",
+            "price": 12.5,
+            "category": "classiques",
+            "imageUrl": "/images/pizzas/category-classiques.jpg"
+        },
+        {
+            "id": "saveur-plus",
+            "name": "Saveur Plus",
+            "description": "Sauce tomate, roquefort, mozza, chèvre, oignons rouges, fromage",
+            "price": 14,
+            "category": "classiques",
+            "imageUrl": "/images/pizzas/category-classiques.jpg"
+        },
+        {
+            "id": "mozzarella-champignons",
+            "name": "Mozzarella-champignons",
+            "description": "Sauce tomate, mozzarella, champignons",
+            "price": 10.5,
+            "category": "classiques",
+            "imageUrl": "/images/pizzas/category-classiques.jpg"
+        },
+        {
+            "id": "mozzarella-jambon",
+            "name": "Mozzarella-jambon",
+            "description": "Sauce tomate, mozzarella, jambon",
+            "price": 10.5,
+            "category": "classiques",
+            "imageUrl": "/images/pizzas/category-classiques.jpg"
+        },
+        {
+            "id": "jambon-fromage",
+            "name": "Jambon-fromage",
+            "description": "Sauce tomate, jambon, fromage",
+            "price": 10.5,
+            "category": "classiques",
+            "imageUrl": "/images/pizzas/category-classiques.jpg"
+        },
+        {
+            "id": "champignons-fromage",
+            "name": "Champignons-fromage",
+            "description": "Sauce tomate, champignons, fromage",
+            "price": 10.5,
+            "category": "classiques",
+            "imageUrl": "/images/pizzas/category-classiques.jpg"
+        },
+        {
+            "id": "brousse-fromage",
+            "name": "Brousse-fromage",
+            "description": "Sauce tomate, brousse, fromage",
+            "price": 10.5,
+            "category": "classiques",
+            "imageUrl": "/images/pizzas/category-classiques.jpg"
+        },
+        {
+            "id": "oignons-fromage",
+            "name": "Oignons-fromage",
+            "description": "Sauce tomate, oignons, fromage",
+            "price": 10.5,
+            "category": "classiques",
+            "imageUrl": "/images/pizzas/category-classiques.jpg"
+        },
+        {
+            "id": "chorizo-fromage",
+            "name": "Chorizo-fromage",
+            "description": "Sauce tomate, chorizo, fromage",
+            "price": 10.5,
+            "category": "classiques",
+            "imageUrl": "/images/pizzas/category-classiques.jpg"
+        },
+        {
+            "id": "thon-fromage",
+            "name": "Thon-fromage",
+            "description": "Sauce tomate, thon, fromage",
+            "price": 10.5,
+            "category": "classiques",
+            "imageUrl": "/images/pizzas/category-classiques.jpg"
+        },
+        {
+            "id": "roquefort-fromage",
+            "name": "Roquefort-fromage",
+            "description": "Sauce tomate, roquefort, fromage",
+            "price": 10.5,
+            "category": "classiques",
+            "imageUrl": "/images/pizzas/category-classiques.jpg"
+        },
+        {
+            "id": "parme",
+            "name": "Parme",
+            "description": "Sauce tomate, mozzarella, noix de bœuf séchée, roquette",
+            "price": 14,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "pissaladiere",
+            "name": "Pissaladière",
+            "description": "Sauce tomate, tomate fraîches, oignons, anchois, fromage",
+            "price": 12.5,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "vegetarienne",
+            "name": "Végétarienne",
+            "description": "Sauce tomate, champignons, tomates fraîches, oignons, poivrons",
+            "price": 12,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "dolce",
+            "name": "Dolce",
+            "description": "Sauce tomate et crème, roquefort, champignons, chèvre, chorizo, fromage",
+            "price": 13,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "provencale",
+            "name": "Provençale",
+            "description": "Sauce tomate, tomates fraîches, fromage, mozzarella, huile d'olive",
+            "price": 12.5,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "royale",
+            "name": "Royale",
+            "description": "Sauce tomate, champignon, jambon, mozzarella, fromage",
+            "price": 12.5,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "4-fromages",
+            "name": "4 fromages",
+            "description": "Sauce tomate, roquefort, brousse, chèvre, fromage",
+            "price": 12.5,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "fermiere",
+            "name": "Fermière",
+            "description": "Sauce tomate, chorizo, oignons, poivrons, fromage",
+            "price": 12.5,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "fraicheur",
+            "name": "Fraicheur",
+            "description": "Sauce tomate, mozzarella, tomates fraîches, sauce pesto maison, roquette",
+            "price": 14,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "meridionale",
+            "name": "Méridionale",
+            "description": "Sauce tomate, chèvre, sauce pesto maison, fromage",
+            "price": 14,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "regina",
+            "name": "Régina",
+            "description": "Sauce tomate, brousse, aubergines, mozzarella",
+            "price": 13.5,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "carnivore",
+            "name": "Carnivore",
+            "description": "Sauce tomate, tomates fraîches, poulet, merguez, bœuf haché, mozzarella, fromage",
+            "price": 15,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "burger",
+            "name": "Burger",
+            "description": "Sauce tomate, boeuf haché, cheddar, oignons, fromage",
+            "price": 14.5,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "armenienne",
+            "name": "Arménienne",
+            "description": "Sauce tomate, oignons, poivrons, bœuf haché",
+            "price": 13,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "orientale",
+            "name": "Orientale",
+            "description": "Sauce tomate, oignons, poivrons, merguez, fromage",
+            "price": 13,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "basquaise",
+            "name": "Basquaise",
+            "description": "Sauce tomate, poulet, oignons, poivrons, œuf, fromage",
+            "price": 13,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "moussaka",
+            "name": "Moussaka",
+            "description": "Sauce tomate, bœuf haché, aubergines, mozzarella, fromage",
+            "price": 14,
+            "category": "base-sauce",
+            "imageUrl": "/images/pizzas/category-base-sauce.jpg"
+        },
+        {
+            "id": "montagnarde",
+            "name": "Montagnarde",
+            "description": "Crème fraîche, p. de terre, raclette, reblochon, noix de bœuf séchée, fromage",
+            "price": 14,
+            "category": "base-creme",
+            "imageUrl": "/images/pizzas/category-base-creme.jpg"
+        },
+        {
+            "id": "savoyarde",
+            "name": "Savoyarde",
+            "description": "Crème fraîche, champignons, jambon, raclette, bacon, oeuf, fromage",
+            "price": 13.5,
+            "category": "base-creme",
+            "imageUrl": "/images/pizzas/category-base-creme.jpg"
+        },
+        {
+            "id": "curry",
+            "name": "Curry",
+            "description": "Crème fraîche, curry, poulet, oignons, reblochon, fromage",
+            "price": 14,
+            "category": "base-creme",
+            "imageUrl": "/images/pizzas/category-base-creme.jpg"
+        },
+        {
+            "id": "regionale",
+            "name": "Régionale",
+            "description": "Crème fraîche, poulet, raclette, sauce ail basilic, fromage",
+            "price": 13,
+            "category": "base-creme",
+            "imageUrl": "/images/pizzas/category-base-creme.jpg"
+        },
+        {
+            "id": "tartiflette",
+            "name": "Tartiflette",
+            "description": "Crème fraîche, p. de terre, oignons, lardons, reblochon, fromage",
+            "price": 13.5,
+            "category": "base-creme",
+            "imageUrl": "/images/pizzas/category-base-creme.jpg"
+        },
+        {
+            "id": "4-fromages-creme",
+            "name": "4 fromages crème",
+            "description": "Crème fraîche, brousse, roquefort, chèvre, fromage",
+            "price": 12.5,
+            "category": "base-creme",
+            "imageUrl": "/images/pizzas/category-base-creme.jpg"
+        },
+        {
+            "id": "royale-creme",
+            "name": "Royale crème",
+            "description": "Crème fraîche, jambon, champignons, mozzarella, fromage",
+            "price": 12.5,
+            "category": "base-creme",
+            "imageUrl": "/images/pizzas/category-base-creme.jpg"
+        },
+        {
+            "id": "capri",
+            "name": "Capri",
+            "description": "Crème fraîche, courgettes, chèvre, huile d'olive, fromage",
+            "price": 14,
+            "category": "base-creme",
+            "imageUrl": "/images/pizzas/category-base-creme.jpg"
+        },
+        {
+            "id": "norvegienne",
+            "name": "Norvégienne",
+            "description": "Crème fraîche, p. de terre, oignons, saumon fumé, fromage",
+            "price": 14,
+            "category": "base-creme",
+            "imageUrl": "/images/pizzas/category-base-creme.jpg"
+        },
+        {
+            "id": "la-miel",
+            "name": "La Miel",
+            "description": "Crème fraîche, fromage de chèvre, oignons, miel, fromage",
+            "price": 12.5,
+            "category": "base-creme",
+            "imageUrl": "/images/pizzas/category-base-creme.jpg"
+        },
+        {
+            "id": "la-figue",
+            "name": "La Figue",
+            "description": "Crème fraîche, oignons, brousse, chèvre, confiture de figue, fromage",
+            "price": 13,
+            "category": "base-creme",
+            "imageUrl": "/images/pizzas/category-base-creme.jpg"
+        },
+        {
+            "id": "burrata-verde",
+            "name": "Burrata Verde",
+            "description": "Crème fraîche, noix de bœuf séchée, sauce pesto maison, burrata",
+            "price": 16,
+            "category": "gourmets",
+            "imageUrl": "/images/pizzas/category-gourmets.jpg"
+        },
+        {
+            "id": "truffe",
+            "name": "Truffe",
+            "description": "Crème à la truffe, mozza, burrata, roquette, vinaigre balsamique à la truffe",
+            "price": 18.5,
+            "category": "gourmets",
+            "imageUrl": "/images/pizzas/category-gourmets.jpg"
+        },
+        {
+            "id": "oslo",
+            "name": "Oslo",
+            "description": "Crème fraîche, saumon fumé, ricotta, citron, mozza, huile d'olive, roquette",
+            "price": 15.5,
+            "category": "gourmets",
+            "imageUrl": "/images/pizzas/category-gourmets.jpg"
+        },
+        {
+            "id": "serenata",
+            "name": "Serenata",
+            "description": "Sauce tomate, stracciatella, tomates confites, huile d'olive, basilic frais, mozza",
+            "price": 16,
+            "category": "gourmets",
+            "imageUrl": "/images/pizzas/category-gourmets.jpg"
+        },
+        {
+            "id": "forestier",
+            "name": "Forestier",
+            "description": "Sauce tomate, crème fraîche, champignons, mozzarella, fromage",
+            "price": 12.5,
+            "category": "chaussons",
+            "imageUrl": "/images/pizzas/category-chaussons.jpg"
+        },
+        {
+            "id": "san-marco",
+            "name": "San Marco",
+            "description": "Sauce tomate, mozzarella, jambon, brousse, fromage",
+            "price": 12.5,
+            "category": "chaussons",
+            "imageUrl": "/images/pizzas/category-chaussons.jpg"
+        },
+        {
+            "id": "venitien",
+            "name": "Vénitien",
+            "description": "Sauce tomate, mozzarella, jambon, fromage de chèvre, fromage",
+            "price": 12.5,
+            "category": "chaussons",
+            "imageUrl": "/images/pizzas/category-chaussons.jpg"
+        },
+        {
+            "id": "coca-cola",
+            "name": "Coca-Cola",
+            "description": "1.25L",
+            "price": 3.5,
+            "category": "boissons",
+            "imageUrl": "/images/boissons/generic-drink.png"
+        },
+        {
+            "id": "coca-cola-zero",
+            "name": "Coca-Cola Zéro",
+            "description": "1.25L",
+            "price": 3.5,
+            "category": "boissons",
+            "imageUrl": "/images/boissons/generic-drink.png"
+        },
+        {
+            "id": "ice-tea-peche",
+            "name": "Ice Tea Pêche",
+            "description": "1.25L",
+            "price": 4,
+            "category": "boissons",
+            "imageUrl": "/images/boissons/generic-drink.png"
+        },
+        {
+            "id": "orangina",
+            "name": "Orangina",
+            "description": "1.50L",
+            "price": 4,
+            "category": "boissons",
+            "imageUrl": "/images/boissons/generic-drink.png"
+        },
+        {
+            "id": "oasis-tropical",
+            "name": "Oasis Tropical",
+            "description": "2.00L",
+            "price": 4,
+            "category": "boissons",
+            "imageUrl": "/images/boissons/generic-drink.png"
+        },
+        {
+            "id": "glace-100ml",
+            "name": "Glace Häagen-Dazs 100ml",
+            "description": "100ml : Macadamia, vanille, caramel beurre salé chocolat",
+            "price": 4,
+            "category": "desserts",
+            "imageUrl": "/images/desserts/generic-icecream.jpg"
+        },
+        {
+            "id": "glace-500ml",
+            "name": "Glace Häagen-Dazs 500ml",
+            "description": "500ml : Macadamia, vanille, caramel beurre salé chocolat",
+            "price": 10,
+            "category": "desserts",
+            "imageUrl": "/images/desserts/generic-icecream.jpg"
+        }
+    ]
+}

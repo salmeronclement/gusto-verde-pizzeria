@@ -22,27 +22,41 @@ router.post('/', async (req, res) => {
     try {
         console.log("1. Fetching service/settings...");
         // =================================================================
-        // 0. CONFIG : Récupérer le service et les réglages fidélité
+        // 0. CONFIG : Récupérer le service, les réglages fidélité et LIVRAISON
         // =================================================================
         let serviceId = null;
         let loyaltyEnabled = false;
         let costPerReward = 10;
+        let deliverySettings = {
+            fees: 0,
+            freeThreshold: 1000,
+            zones: [] // [{min_order: 15, zones: [{zip: '75001'}]}]
+        };
 
         const [services] = await promiseDb.query("SELECT id FROM services WHERE status = 'open' LIMIT 1");
         if (services.length > 0) {
             serviceId = services[0].id;
         }
 
-        const [settingsRows] = await promiseDb.query("SELECT setting_value FROM site_settings WHERE setting_key = 'loyalty_program'");
-        if (settingsRows.length > 0) {
+        const [settingsRows] = await promiseDb.query("SELECT setting_key, setting_value FROM site_settings WHERE setting_key IN ('loyalty_program', 'delivery_zones', 'delivery_fees', 'free_delivery_threshold')");
+
+        settingsRows.forEach(row => {
             try {
-                const loyaltySettings = JSON.parse(settingsRows[0].setting_value);
-                loyaltyEnabled = loyaltySettings.enabled || false;
-                costPerReward = loyaltySettings.target_pizzas || 10;
+                if (row.setting_key === 'loyalty_program') {
+                    const val = JSON.parse(row.setting_value);
+                    loyaltyEnabled = val.enabled || false;
+                    costPerReward = val.target_pizzas || 10;
+                } else if (row.setting_key === 'delivery_zones') {
+                    deliverySettings.zones = JSON.parse(row.setting_value) || [];
+                } else if (row.setting_key === 'delivery_fees') {
+                    deliverySettings.fees = Number(row.setting_value) || 0;
+                } else if (row.setting_key === 'free_delivery_threshold') {
+                    deliverySettings.freeThreshold = Number(row.setting_value) || 1000;
+                }
             } catch (e) {
-                console.error('Error parsing loyalty settings:', e);
+                console.error(`Error parsing setting ${row.setting_key}:`, e);
             }
-        }
+        });
 
         console.log("2. Handling Customer...");
         // =================================================================
@@ -132,6 +146,37 @@ router.post('/', async (req, res) => {
 
                 console.log(`Address created: ${addressId}`);
             }
+
+            // =================================================================
+            // 2b. VALIDATION LIVRAISON (Code Postal & Min Command)
+            // =================================================================
+            // On le fait ICI car on a besoin du code postal
+            // Note: On utilisera 'subtotal' plus tard pour valider le montant, 
+            // mais on doit valider le code postal MAINTENANT.
+
+            let validZone = false;
+            let requiredMinOrder = 0;
+
+            const postalCodeToCheck = String(postalCode).trim();
+            const cityToCheck = String(city).trim().toLowerCase();
+
+            // Check tiers
+            for (const tier of deliverySettings.zones) {
+                // tier = { min_order: 15, zones: [{zip: '75001', city: 'Paris'}] }
+                const match = tier.zones.find(z => z.zip === postalCodeToCheck);
+                if (match) {
+                    validZone = true;
+                    requiredMinOrder = Number(tier.min_order);
+                    break;
+                }
+            }
+
+            if (!validZone) {
+                return res.status(400).json({ error: `Nous ne livrons pas au code postal ${postalCodeToCheck}.` });
+            }
+
+            // On stocke le min order requis pour le vérifier APRÈS le calcul du total
+            req.requiredMinOrder = requiredMinOrder;
         }
 
         console.log("4. Fetching Products...");
@@ -219,18 +264,35 @@ router.post('/', async (req, res) => {
         // =================================================================
         // 5. CRÉATION DE LA COMMANDE
         // =================================================================
-        let totalAmount = subtotal;
 
-        // Frais de livraison
-        if (deliveryFee && !isNaN(deliveryFee)) {
-            totalAmount += Number(deliveryFee);
+        // Validation Montant Min pour Livraison
+        if (mode === 'livraison' && req.requiredMinOrder) {
+            if (subtotal < req.requiredMinOrder) {
+                return res.status(400).json({
+                    error: `Le minimum de commande pour votre zone est de ${req.requiredMinOrder.toFixed(2)}€ (Total actuel: ${subtotal.toFixed(2)}€)`
+                });
+            }
         }
+
+        let totalAmount = subtotal;
+        let finalDeliveryFee = 0;
+
+        // Frais de livraison (Calcul Serveur)
+        if (mode === 'livraison') {
+            finalDeliveryFee = Number(deliverySettings.fees);
+            // Si Total > Seuil gratuité, frais offerts
+            if (subtotal >= deliverySettings.freeThreshold) {
+                finalDeliveryFee = 0;
+            }
+            totalAmount += finalDeliveryFee;
+        }
+
         totalAmount = Math.max(0, totalAmount);
 
         // Insertion Commande
         const [orderResult] = await promiseDb.query(
             'INSERT INTO orders (customer_id, address_id, mode, status, total_amount, delivery_fee, service_id, comment, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())',
-            [customerId, addressId, mode, 'en_attente', totalAmount, Number(deliveryFee) || 0, serviceId, comment || null]
+            [customerId, addressId, mode, 'en_attente', totalAmount, finalDeliveryFee, serviceId, comment || null]
         );
         const orderId = orderResult.insertId;
 

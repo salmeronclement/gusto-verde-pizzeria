@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useCartStore } from '../store/useCartStore';
 import { getProducts, submitOrder } from '../services/api';
 import { useAuthStore } from '../store/useAuthStore';
+import { useSettingsStore } from '../store/useSettingsStore';
 import { formatPrice } from '../utils/products';
 import { ShoppingBag, ArrowRight, Utensils, MapPin, Phone, User, Store, Bike, AlertCircle } from 'lucide-react';
 
@@ -79,11 +80,13 @@ const OrderRecap: React.FC = () => {
         } as any);
     };
 
+    const { settings } = useSettingsStore(); // Import useSettingsStore
+
     const handleSubmit = async () => {
         setLoading(true);
         setError(null);
 
-        // Validation
+        // Validation standard
         if (!customerInfo.firstName || !customerInfo.lastName || !customerInfo.phone) {
             setError("Merci de renseigner vos coordonnées complètes.");
             setLoading(false);
@@ -96,6 +99,36 @@ const OrderRecap: React.FC = () => {
                 setLoading(false);
                 return;
             }
+
+            // === NOUVELLE VALIDATION STRICTE (Zone & Montant) ===
+            // On vérifie si c'est livrable AVANT d'envoyer
+            // Note: On utilise les settings chargés (si disponibles)
+            if (settings && settings.delivery_zones?.length > 0) {
+                const postalCodeToCheck = customerInfo.address.postalCode.trim();
+                let validZone = false;
+                let requiredMinOrder = 0;
+
+                for (const tier of settings.delivery_zones) {
+                    const match = tier.zones.find((z: any) => z.zip === postalCodeToCheck);
+                    if (match) {
+                        validZone = true;
+                        requiredMinOrder = Number(tier.min_order);
+                        break;
+                    }
+                }
+
+                if (!validZone) {
+                    setError(`Nous ne livrons malheureusement pas le code postal ${postalCodeToCheck}.`);
+                    setLoading(false);
+                    return;
+                }
+
+                if (total < requiredMinOrder) {
+                    setError(`Le minimum de commande pour votre zone (${postalCodeToCheck}) est de ${requiredMinOrder}€. (Actuel : ${formatPrice(total)})`);
+                    setLoading(false);
+                    return;
+                }
+            }
         }
 
         try {
@@ -106,7 +139,7 @@ const OrderRecap: React.FC = () => {
                     last_name: customerInfo.lastName,
                     phone: customerInfo.phone,
                     email: customerInfo.email,
-                    comment: orderComment // Ajout du commentaire ici pour matcher api.ts
+                    comment: orderComment
                 },
                 address: mode === 'livraison' ? {
                     street: customerInfo.address.street,
@@ -118,8 +151,7 @@ const OrderRecap: React.FC = () => {
                     id: item.id,
                     quantity: item.quantity,
                     notes: item.notes
-                })),
-                // comment: orderComment removed from top level
+                }))
             };
 
             // Appel API conforme (4 arguments)
@@ -131,9 +163,11 @@ const OrderRecap: React.FC = () => {
                     total
                 }
             });
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            setError("Une erreur est survenue lors de la validation. Réessayez ou appelez-nous.");
+            // Affichage de l'erreur précise du backend (ex: Problème fidélité, min order, etc.)
+            const msg = err.response?.data?.error || "Une erreur est survenue lors de la validation. Réessayez ou appelez-nous.";
+            setError(msg);
         } finally {
             setLoading(false);
         }

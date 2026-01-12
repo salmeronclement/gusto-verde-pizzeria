@@ -6,13 +6,7 @@ export * from '../types';
  * - NGINX intercepte /api
  * - Le frontend ne connaît PAS le backend
  */
-/**
- * En production :
- * - On pointe directement vers le backend (port 5005) pour éviter les problèmes de proxy Nginx non configuré.
- */
-export const API_BASE_URL = import.meta.env.PROD
-  ? 'http://51.68.229.173:5005/api'
-  : (import.meta.env.VITE_API_URL || 'http://localhost:5005/api');
+export const API_BASE_URL = 'http://51.68.229.173:5005/api';
 
 
 export const api = axios.create({

@@ -108,10 +108,18 @@ router.post('/', async (req, res) => {
             }
 
             const street = address.street;
-            const postalCode = address.postal_code || address.postalCode;
+            // Sécurisation : on force une chaîne valide ou null
+            const postalCodeInput = address.postal_code || address.postalCode;
+            const postalCode = postalCodeInput ? String(postalCodeInput).trim() : null;
+
             const city = address.city;
             const additionalInfo = address.additional_info || address.additionalInfo;
             const label = address.label || 'Domicile';
+
+            // VALIDATION STRICTE DU CODE POSTAL (Fix ER_BAD_NULL_ERROR)
+            if (!postalCode || postalCode.length < 3) {
+                return res.status(400).json({ error: "Le code postal est obligatoire pour la livraison." });
+            }
 
             // Vérifier si l'adresse existe déjà à l'identique pour ce client
             const [existingAddresses] = await promiseDb.query(
@@ -138,6 +146,7 @@ router.post('/', async (req, res) => {
                 }
             } else {
                 // Création
+                // Ici postalCode est GARANTI non-null par la validation ci-dessus
                 const [addrResult] = await promiseDb.query(
                     'INSERT INTO addresses (customer_id, label, street, postal_code, city, additional_info) VALUES (?, ?, ?, ?, ?, ?)',
                     [customerId, label, street, postalCode, city, additionalInfo]

@@ -94,8 +94,10 @@ const OrderRecap: React.FC = () => {
         }
 
         if (mode === 'livraison') {
-            if (!customerInfo.address.street || !customerInfo.address.postalCode || !customerInfo.address.city) {
-                setError("Adresse incomplète pour la livraison.");
+            const { street, postalCode, city } = customerInfo.address;
+
+            if (!street || !postalCode || !city || postalCode.trim() === '') {
+                setError("Veuillez renseigner une adresse complète avec Code Postal.");
                 setLoading(false);
                 return;
             }

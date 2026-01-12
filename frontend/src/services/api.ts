@@ -21,12 +21,16 @@ export const getImageUrl = (path: string | undefined | null) => {
   if (!path) return '/api/placeholder/400/320';
   if (path.startsWith('http')) return path;
 
-  // On retire '/api' de la base URL pour les images car elles sont servies à la racine /uploads
-  const baseUrl = API_BASE_URL.endsWith('/api')
-    ? API_BASE_URL.slice(0, -4)
-    : API_BASE_URL;
+  // Si c'est un upload backend, on ajoute l'URL du backend
+  if (path.startsWith('/uploads')) {
+    const baseUrl = API_BASE_URL.endsWith('/api')
+      ? API_BASE_URL.slice(0, -4)
+      : API_BASE_URL;
+    return `${baseUrl}${path}`;
+  }
 
-  return `${baseUrl}${path}`;
+  // Sinon (ex: /images/...), c'est un asset statique du frontend
+  return path;
 };
 
 // Intercepteur pour le token JWT

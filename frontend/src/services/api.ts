@@ -3,11 +3,12 @@ import axios from 'axios';
 export * from '../types';
 
 // 👇 Configuration de l'API (Production)
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5005';
-// export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5005';
+// 👇 Configuration de l'API (Production)
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5005/api';
+// export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5005/api';
 
 export const api = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -17,7 +18,13 @@ export const api = axios.create({
 export const getImageUrl = (path: string | undefined | null) => {
   if (!path) return '/api/placeholder/400/320';
   if (path.startsWith('http')) return path;
-  return `${API_BASE_URL}${path}`;
+
+  // On retire '/api' de la base URL pour les images car elles sont servies à la racine /uploads
+  const baseUrl = API_BASE_URL.endsWith('/api')
+    ? API_BASE_URL.slice(0, -4)
+    : API_BASE_URL;
+
+  return `${baseUrl}${path}`;
 };
 
 // Intercepteur pour le token JWT

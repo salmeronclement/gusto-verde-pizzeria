@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { Bike, History, LogOut, Circle, Moon, Sun } from 'lucide-react';
 // Correction de l'import : on utilise updateDriver au lieu de updateDriverStatus

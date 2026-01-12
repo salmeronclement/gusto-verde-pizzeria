@@ -1,6 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+
+// VÉRIFICATION CRITIQUE CONFIG DB
+const requiredEnv = ['DB_HOST', 'DB_USER', 'DB_NAME'];
+const missingEnv = requiredEnv.filter(key => !process.env.hasOwnProperty(key) || !process.env[key]);
+if (missingEnv.length > 0) {
+    console.error('❌ FATAL: Variables d\'environnement manquantes :', missingEnv.join(', '));
+    process.exit(1);
+}
+
 const db = require('./config/db');
 
 const app = express();
@@ -16,23 +25,13 @@ const authRoutes = require('./routes/authRoutes');
 const contentRoutes = require('./routes/contentRoutes');
 const path = require('path');
 
-// Middleware
+// Middleware (API only)
 app.use(cors());
 app.use(express.json());
 
-// LOGGING DEBUG
-app.use((req, res, next) => {
-    console.log(`[DEBUG] ${req.method} ${req.url}`);
-    next();
-});
-
+// Assets publics (Uploads uniquement)
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Hero slides uploads
-
-// Servir les fichiers statiques du frontend (React build)
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const verifyAdminToken = require('./middleware/adminMiddleware');
 
@@ -43,16 +42,16 @@ app.use('/api/admin/drivers', verifyAdminToken, adminDriversRoutes);
 app.use('/api/admin/deliveries', verifyAdminToken, adminDeliveriesRoutes);
 app.use('/api/admin/stats', verifyAdminToken, adminStatsRoutes);
 app.use('/api/admin/products', verifyAdminToken, adminProductsRoutes);
-app.use('/api/blog', require('./routes/blogRoutes')); // Blog routes (public GET, admin protected)
-app.use('/api/admin/settings', adminSettingsRoutes); // Handling auth internally for /public exception
+app.use('/api/blog', require('./routes/blogRoutes'));
+app.use('/api/admin/settings', adminSettingsRoutes);
 app.use('/api/admin/customers', verifyAdminToken, require('./routes/adminCustomersRoutes'));
-app.use('/api/admin/service', require('./routes/adminServiceRoutes')); // Handling auth internally (status is public)
+app.use('/api/admin/service', require('./routes/adminServiceRoutes'));
 app.use('/api/settings/service', require('./routes/serviceRoutes'));
 
-app.use('/api/products', require('./routes/productsRoutes')); // Public products routes
-app.use('/api/auth', authRoutes); // Auth routes
-app.use('/api/driver', require('./routes/driverRoutes')); // Driver routes
-app.use('/api/content', contentRoutes); // Public content routes (hero slides, etc.)
+app.use('/api/products', require('./routes/productsRoutes'));
+app.use('/api/auth', authRoutes);
+app.use('/api/driver', require('./routes/driverRoutes'));
+app.use('/api/content', contentRoutes);
 
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Backend Gusto Verde opérationnel ✅' });
@@ -68,20 +67,14 @@ app.get('/api/db-test', (req, res) => {
     });
 });
 
-// Route "Wildcard" pour renvoyer l'application React sur n'importe quelle autre URL
-// Fallback pour SPA (React) : renvoyer index.html pour les routes non-API
-app.use((req, res, next) => {
-    if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
-        res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-    } else {
-        next();
-    }
+// 404 Global - Empêche toute requête hors API
+app.use((req, res) => {
+    res.status(404).json({ error: 'Not Found (API Only)' });
 });
-
 
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`🚀 Serveur démarré sur le port ${PORT} (VERSION 3 - ${new Date().toISOString()})`);
-    console.log('👉 SI VOUS VOYEZ CE MESSAGE, LE CODE EST A JOUR.');
+    console.log(`🚀 Serveur démarré sur le port ${PORT}`);
+    console.log('✅ Connecté à MySQL (via Pool)');
 });

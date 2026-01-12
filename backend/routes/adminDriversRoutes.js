@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 // POST /api/admin/drivers
 router.post('/', async (req, res) => {
     try {
-        const { first_name, last_name, phone, email } = req.body;
+        const { first_name, last_name, phone } = req.body;
 
         // Validation simple
         if (!first_name || !last_name || !phone) {
@@ -35,8 +35,8 @@ router.post('/', async (req, res) => {
 
         // Insertion
         const [result] = await promiseDb.query(
-            "INSERT INTO drivers (first_name, last_name, phone, email, created_at, is_active) VALUES (?, ?, ?, ?, NOW(), 1)",
-            [first_name, last_name, phone, email]
+            "INSERT INTO drivers (first_name, last_name, phone, created_at, is_active) VALUES (?, ?, ?, NOW(), 1)",
+            [first_name, last_name, phone]
         );
 
         // On renvoie le livreur créé

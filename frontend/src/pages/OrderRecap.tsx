@@ -5,19 +5,24 @@ import { getProducts, submitOrder } from '../services/api';
 import { useAuthStore } from '../store/useAuthStore';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { formatPrice } from '../utils/products';
-import { ShoppingBag, ArrowRight, Utensils, MapPin, Phone, User, Store, Bike, AlertCircle } from 'lucide-react';
+import { ShoppingBag, ArrowRight, Utensils, MapPin, Phone, User, Store, Bike, AlertCircle, Calendar, Clock } from 'lucide-react';
 
 const OrderRecap: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuthStore();
+    const { settings, fetchPublicSettings } = useSettingsStore(); // Utilisation du store settings
 
     // On récupère tout depuis le bon store (useCartStore)
     const { items, getTotal, addItem, orderComment, setOrderComment } = useCartStore();
     const [upsellProducts, setUpsellProducts] = useState<any[]>([]);
 
-    // State pour le formulaire de commande (anciennement OrderInfos)
+    // State pour le formulaire de commande
     const [mode, setMode] = useState<'emporter' | 'livraison'>('emporter');
+    const [isScheduled, setIsScheduled] = useState(false);
+    const [scheduledDate, setScheduledDate] = useState(''); // YYYY-MM-DD
+    const [scheduledTime, setScheduledTime] = useState(''); // HH:mm
+
     const [customerInfo, setCustomerInfo] = useState({
         firstName: user?.first_name || '',
         lastName: user?.last_name || '',
@@ -33,6 +38,11 @@ const OrderRecap: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    // Charger les settings si pas encore là
+    useEffect(() => {
+        if (!settings) fetchPublicSettings();
+    }, [settings, fetchPublicSettings]);
+
     // Initialisation depuis location.state ou user
     useEffect(() => {
         if (location.state?.mode) {
@@ -40,16 +50,19 @@ const OrderRecap: React.FC = () => {
         }
 
         // Pré-remplissage adresse si dispo
-        if (user && user.addresses && user.addresses.length > 0) {
-            const defaultAddr = user.addresses[0];
+        if (user) {
             setCustomerInfo(prev => ({
                 ...prev,
-                address: {
-                    street: defaultAddr.street,
-                    postalCode: defaultAddr.postal_code,
-                    city: defaultAddr.city,
-                    additionalInfo: defaultAddr.additional_info || ''
-                }
+                firstName: user.first_name || '',
+                lastName: user.last_name || '',
+                phone: user.phone || '',
+                email: user.email || '',
+                address: (user.addresses && user.addresses.length > 0) ? {
+                    street: user.addresses[0].street,
+                    postalCode: user.addresses[0].postalCode || user.addresses[0].postal_code,
+                    city: user.addresses[0].city,
+                    additionalInfo: user.addresses[0].additional_info || ''
+                } : prev.address
             }));
         }
     }, [location.state, user]);
@@ -80,7 +93,71 @@ const OrderRecap: React.FC = () => {
         } as any);
     };
 
-    const { settings } = useSettingsStore(); // Import useSettingsStore
+
+
+
+    const getNext7Days = () => {
+        if (!settings?.schedule) return [];
+        const days = [];
+        const now = new Date();
+        const daysMap = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(now);
+            date.setDate(now.getDate() + i);
+            const dayName = daysMap[date.getDay()];
+            const schedule = settings.schedule.find((s: any) => s.day === dayName);
+
+            if (schedule && !schedule.closed) {
+                days.push({
+                    date: date.toISOString().split('T')[0],
+                    label: i === 0 ? "Aujourd'hui" : i === 1 ? "Demain" : `${dayName} ${date.getDate()}`,
+                    dayName: dayName,
+                    open: schedule.open,
+                    close: schedule.close
+                });
+            }
+        }
+        return days;
+    };
+
+    const getTimeSlots = (dateStr: string) => {
+        const dayInfo = getNext7Days().find(d => d.date === dateStr);
+        if (!dayInfo) return [];
+
+        const slots = [];
+        const [openHour, openMin] = dayInfo.open.split(':').map(Number);
+        const [closeHour, closeMin] = dayInfo.close.split(':').map(Number);
+
+        let openTime = openHour * 60 + openMin;
+        let closeTime = closeHour * 60 + closeMin;
+
+        // Si closeTime < openTime (ex: ferme à 01h00), on ajoute 24h
+        if (closeTime < openTime) closeTime += 24 * 60;
+
+        const now = new Date();
+        const isToday = dateStr === now.toISOString().split('T')[0];
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+        // Start 30 mins from now if today, else from openTime
+        // Si today et current > close, c'est mort pour ajd
+        let startTime = openTime;
+        if (isToday) {
+            startTime = Math.max(openTime, currentMinutes + 30);
+        }
+
+        // Round up to next 15 min
+        startTime = Math.ceil(startTime / 15) * 15;
+
+        for (let t = startTime; t <= closeTime; t += 15) {
+            let h = Math.floor(t / 60);
+            const m = t % 60;
+            if (h >= 24) h -= 24; // Handle post-midnight
+            const timeStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+            slots.push(timeStr);
+        }
+        return slots;
+    };
 
     const handleSubmit = async () => {
         setLoading(true);
@@ -93,6 +170,18 @@ const OrderRecap: React.FC = () => {
             return;
         }
 
+        // Validation Planification
+        let finalScheduledAt: string | null = null;
+        if (isScheduled) {
+            if (!scheduledDate || !scheduledTime) {
+                setError("Veuillez sélectionner une date et une heure pour la commande planifiée.");
+                setLoading(false);
+                return;
+            }
+            // Format YYYY-MM-DD HH:mm:ss
+            finalScheduledAt = `${scheduledDate} ${scheduledTime}:00`;
+        }
+
         if (mode === 'livraison') {
             const { street, postalCode, city } = customerInfo.address;
 
@@ -103,8 +192,6 @@ const OrderRecap: React.FC = () => {
             }
 
             // === NOUVELLE VALIDATION STRICTE (Zone & Montant) ===
-            // On vérifie si c'est livrable AVANT d'envoyer
-            // Note: On utilise les settings chargés (si disponibles)
             if (settings && settings.delivery_zones?.length > 0) {
                 const postalCodeToCheck = customerInfo.address.postalCode.trim();
                 let validZone = false;
@@ -156,8 +243,8 @@ const OrderRecap: React.FC = () => {
                 }))
             };
 
-            // Appel API conforme (4 arguments)
-            const response = await submitOrder(items, orderData.customer, mode, orderData.address);
+            // Appel API avec scheduledAt (5 arguments)
+            const response = await submitOrder(items, orderData.customer, mode, orderData.address, finalScheduledAt);
 
             navigate('/commande/confirmation', {
                 state: {
@@ -268,6 +355,62 @@ const OrderRecap: React.FC = () => {
                             >
                                 <Bike size={20} /> Livraison
                             </button>
+                        </div>
+
+                        {/* Planification */}
+                        <div className="bg-white rounded-xl shadow-sm p-4">
+                            <h3 className="text-sm font-bold text-gray-500 mb-3 uppercase flex items-center gap-2">
+                                <Clock size={16} /> Quand souhaitez-vous votre commande ?
+                            </h3>
+                            <div className="flex gap-2 bg-gray-100 p-1 rounded-lg mb-4">
+                                <button
+                                    onClick={() => { setIsScheduled(false); setScheduledDate(''); setScheduledTime(''); }}
+                                    className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${!isScheduled ? 'bg-white shadow text-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                                >
+                                    Dès que possible
+                                </button>
+                                <button
+                                    onClick={() => setIsScheduled(true)}
+                                    className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${isScheduled ? 'bg-white shadow text-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                                >
+                                    Planifier <Calendar size={14} className="inline ml-1" />
+                                </button>
+                            </div>
+
+                            {isScheduled && (
+                                <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 mb-1">Date</label>
+                                        <select
+                                            className="w-full p-2 bg-gray-50 rounded-lg border-2 border-transparent focus:border-primary outline-none"
+                                            value={scheduledDate}
+                                            onChange={(e) => {
+                                                setScheduledDate(e.target.value);
+                                                setScheduledTime('');
+                                            }}
+                                        >
+                                            <option value="">Choisir...</option>
+                                            {getNext7Days().map(d => (
+                                                <option key={d.date} value={d.date}>{d.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 mb-1">Heure</label>
+                                        <select
+                                            className="w-full p-2 bg-gray-50 rounded-lg border-2 border-transparent focus:border-primary outline-none"
+                                            value={scheduledTime}
+                                            onChange={(e) => setScheduledTime(e.target.value)}
+                                            disabled={!scheduledDate}
+                                        >
+                                            <option value="">Choisir...</option>
+                                            {scheduledDate && getTimeSlots(scheduledDate).map(t => (
+                                                <option key={t} value={t}>{t}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Formulaire */}

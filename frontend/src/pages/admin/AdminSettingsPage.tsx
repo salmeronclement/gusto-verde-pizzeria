@@ -85,11 +85,25 @@ const AdminSettingsPage: React.FC = () => {
                 return val || fallback;
             };
 
+            // Default Schedule if empty
+            const defaultSchedule: ScheduleItem[] = [
+                { day: 'Lundi', open: '18:00', close: '22:00', closed: true },
+                { day: 'Mardi', open: '18:00', close: '22:00', closed: true },
+                { day: 'Mercredi', open: '18:00', close: '22:00', closed: false },
+                { day: 'Jeudi', open: '18:00', close: '22:00', closed: false },
+                { day: 'Vendredi', open: '18:00', close: '23:00', closed: false },
+                { day: 'Samedi', open: '18:00', close: '23:00', closed: false },
+                { day: 'Dimanche', open: '18:00', close: '22:00', closed: false },
+            ];
+
+            const scheduleData = safeParse(data.schedule, []);
+            const finalSchedule = scheduleData.length > 0 ? scheduleData : defaultSchedule;
+
             setSettings({
                 ...data,
                 emergency_close: data.emergency_close === true || data.emergency_close === 'true',
                 auto_print_on_validate: data.auto_print_on_validate === true || data.auto_print_on_validate === 'true',
-                schedule: safeParse(data.schedule, []),
+                schedule: finalSchedule,
                 delivery_zones: safeParse(data.delivery_zones, []),
                 loyalty_program: safeParse(data.loyalty_program, { enabled: false, target_pizzas: 10 }),
                 promo_offer: safeParse(data.promo_offer, { enabled: false, buy_quantity: 3, get_quantity: 1, item_type: 'pizza' })
@@ -134,6 +148,19 @@ const AdminSettingsPage: React.FC = () => {
             const updates = type === 'loyalty'
                 ? { is_loyalty_eligible: value ? 1 : 0 }
                 : { is_promo_eligible: value ? 1 : 0 };
+
+            // Optimistic Update
+            if (targetIds.length > 0) {
+                setProducts(prev => prev.map(p => {
+                    if (targetIds.includes(p.id)) {
+                        return {
+                            ...p,
+                            ...(type === 'loyalty' ? { is_loyalty_eligible: value } : { is_promo_eligible: value })
+                        };
+                    }
+                    return p;
+                }));
+            }
 
             await bulkUpdateProducts({
                 productIds: targetIds,
@@ -599,12 +626,12 @@ const AdminSettingsPage: React.FC = () => {
                                             <label key={product.id} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-purple-50 cursor-pointer">
                                                 <input
                                                     type="checkbox"
-                                                    checked={product.isPromoEligible !== undefined ? !!product.isPromoEligible : true}
-                                                    onChange={() => togglePromoEligibility(product.id, product.isPromoEligible !== undefined ? !!product.isPromoEligible : true)}
+                                                    checked={(product as any).is_promo_eligible !== undefined ? !!(product as any).is_promo_eligible : true}
+                                                    onChange={() => togglePromoEligibility(product.id, (product as any).is_promo_eligible !== undefined ? !!(product as any).is_promo_eligible : true)}
                                                     className="w-5 h-5 text-purple-500 rounded focus:ring-purple-500"
                                                 />
                                                 <div className="flex-1">
-                                                    <p className="font-medium text-gray-900">{product.name} {(product.isPromoEligible !== undefined ? !!product.isPromoEligible : true) && '🎁'}</p>
+                                                    <p className="font-medium text-gray-900">{product.name} {((product as any).is_promo_eligible !== undefined ? !!(product as any).is_promo_eligible : true) && '🎁'}</p>
                                                     <p className="text-xs text-gray-500">{Number(product.price).toFixed(2)} €</p>
                                                 </div>
                                             </label>

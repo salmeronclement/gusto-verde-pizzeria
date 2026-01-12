@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useAuthStore } from '../../store/useAuthStore';
-import { getUserOrders } from '../../services/api';
+import { getUserOrders, updateUserProfile, addUserAddress, deleteUserAddress } from '../../services/api'; // Added Address APIs
 import { useOrderHistoryStore } from '../../store/useOrderHistoryStore';
 import { useCartStore } from '../../store/useCartStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
-import { Package, Clock, LogOut, User as UserIcon } from 'lucide-react';
+import { Package, Clock, LogOut, User as UserIcon, MapPin, Edit2, Save, X, Plus, Trash2 } from 'lucide-react'; // Added Icons
 import { Link, useNavigate } from 'react-router-dom';
 import LoyaltyRewardCard from '../../components/LoyaltyRewardCard';
 import { Product } from '../../types';
@@ -20,9 +20,25 @@ export default function ClientPage() {
 
     const navigate = useNavigate();
 
+    // État pour l'édition du profil
+    const [isEditing, setIsEditing] = useState(false);
+    const [profileData, setProfileData] = useState({
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: ''
+    });
+
     useEffect(() => {
         if (user) {
             refreshProfile();
+            setProfileData({
+                first_name: user.first_name || '',
+                last_name: user.last_name || '',
+                email: user.email || '',
+                phone: user.phone || ''
+            });
+
             getUserOrders(user.id).then(data => {
                 if (Array.isArray(data)) {
                     setApiOrders(data);
@@ -34,6 +50,60 @@ export default function ClientPage() {
     const handleLogout = () => {
         logout();
         navigate('/');
+    };
+
+    // État pour les adresses
+    const [isAddingAddress, setIsAddingAddress] = useState(false);
+    const [newAddress, setNewAddress] = useState({
+        name: '',
+        street: '',
+        postalCode: '',
+        city: '',
+        additionalInfo: ''
+    });
+
+    // Fonction pour gérer l'ajout d'adresse
+    const handleAddAddress = async () => {
+        if (!user) return;
+        try {
+            await addUserAddress(newAddress);
+            await refreshProfile();
+            setIsAddingAddress(false);
+            setNewAddress({ name: '', street: '', postalCode: '', city: '', additionalInfo: '' });
+            alert("Adresse ajoutée !");
+        } catch (error) {
+            console.error(error);
+            alert("Erreur lors de l'ajout de l'adresse.");
+        }
+    };
+
+    const handleDeleteAddress = async (id: number) => {
+        if (!confirm("Voulez-vous vraiment supprimer cette adresse ?")) return;
+        try {
+            await deleteUserAddress(id);
+            await refreshProfile();
+        } catch (error) {
+            console.error(error);
+            alert("Erreur suppression adresse.");
+        }
+    };
+
+    // Fonction pour sauvegarder le profil
+    const handleSaveProfile = async () => {
+        if (!user) return;
+        try {
+            await updateUserProfile({
+                ...profileData,
+                firstName: profileData.first_name,
+                lastName: profileData.last_name
+            });
+            await refreshProfile(); // Recharger les données depuis le serveur
+            setIsEditing(false);
+            alert("Profil mis à jour avec succès !");
+        } catch (error) {
+            console.error("Erreur mise à jour profil:", error);
+            alert("Erreur lors de la mise à jour du profil.");
+        }
     };
 
     // Fonction pour gérer l'ajout de récompense depuis le dashboard client
@@ -89,10 +159,217 @@ export default function ClientPage() {
                 </div>
             </div>
 
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* SECTION: MES INFORMATIONS */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-bold text-gray-800">Mes Informations</h2>
+                            {!isEditing ? (
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors"
+                                    title="Modifier"
+                                >
+                                    <Edit2 size={20} />
+                                </button>
+                            ) : (
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setIsEditing(false)}
+                                        className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
+                                        title="Annuler"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                    <button
+                                        onClick={handleSaveProfile}
+                                        className="p-2 text-green-600 hover:bg-green-50 rounded-full transition-colors"
+                                        title="Enregistrer"
+                                    >
+                                        <Save size={20} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-sm text-gray-500 block mb-1">Prénom</label>
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            className="w-full border rounded p-2"
+                                            value={profileData.first_name}
+                                            onChange={(e) => setProfileData({ ...profileData, first_name: e.target.value })}
+                                        />
+                                    ) : (
+                                        <div className="font-medium text-gray-900">{user.first_name}</div>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="text-sm text-gray-500 block mb-1">Nom</label>
+                                    {isEditing ? (
+                                        <input
+                                            type="text"
+                                            className="w-full border rounded p-2"
+                                            value={profileData.last_name}
+                                            onChange={(e) => setProfileData({ ...profileData, last_name: e.target.value })}
+                                        />
+                                    ) : (
+                                        <div className="font-medium text-gray-900">{user.last_name}</div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-sm text-gray-500 block mb-1">Email</label>
+                                {isEditing ? (
+                                    <input
+                                        type="email"
+                                        className="w-full border rounded p-2"
+                                        value={profileData.email}
+                                        onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                                    />
+                                ) : (
+                                    <div className="font-medium text-gray-900">{user.email}</div>
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="text-sm text-gray-500 block mb-1">Téléphone</label>
+                                {isEditing ? (
+                                    <input
+                                        type="tel"
+                                        className="w-full border rounded p-2"
+                                        value={profileData.phone}
+                                        onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                                    />
+                                ) : (
+                                    <div className="font-medium text-gray-900">{user.phone}</div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* SECTION: MES ADRESSES */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-bold text-gray-800">Mes Adresses</h2>
+                            {!isAddingAddress && (
+                                <button
+                                    onClick={() => setIsAddingAddress(true)}
+                                    className="flex items-center gap-2 text-sm text-primary font-bold hover:bg-primary/10 px-3 py-2 rounded-lg transition-colors"
+                                >
+                                    <Plus size={16} /> Ajouter
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Formulaire Ajout Adresse */}
+                        {isAddingAddress && (
+                            <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200 animate-in fade-in slide-in-from-top-2">
+                                <h3 className="font-bold text-gray-700 mb-3">Nouvelle adresse</h3>
+                                <div className="space-y-3">
+                                    <input
+                                        type="text"
+                                        placeholder="Nom de l'adresse (Maison, Bureau...)"
+                                        className="w-full p-2 border rounded"
+                                        value={newAddress.name}
+                                        onChange={e => setNewAddress({ ...newAddress, name: e.target.value })}
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Numéro et Rue"
+                                        className="w-full p-2 border rounded"
+                                        value={newAddress.street}
+                                        onChange={e => setNewAddress({ ...newAddress, street: e.target.value })}
+                                    />
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <input
+                                            type="text"
+                                            placeholder="Code Postal"
+                                            className="w-full p-2 border rounded"
+                                            value={newAddress.postalCode}
+                                            onChange={e => setNewAddress({ ...newAddress, postalCode: e.target.value })}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Ville"
+                                            className="w-full p-2 border rounded"
+                                            value={newAddress.city}
+                                            onChange={e => setNewAddress({ ...newAddress, city: e.target.value })}
+                                        />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder="Infos complémentaires (Digicode...)"
+                                        className="w-full p-2 border rounded"
+                                        value={newAddress.additionalInfo}
+                                        onChange={e => setNewAddress({ ...newAddress, additionalInfo: e.target.value })}
+                                    />
+                                    <div className="flex justify-end gap-2 mt-2">
+                                        <button
+                                            onClick={() => setIsAddingAddress(false)}
+                                            className="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg text-sm"
+                                        >
+                                            Annuler
+                                        </button>
+                                        <button
+                                            onClick={handleAddAddress}
+                                            disabled={!newAddress.street || !newAddress.postalCode || !newAddress.city}
+                                            className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-green-600 disabled:opacity-50"
+                                        >
+                                            Enregistrer
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {user.addresses && user.addresses.length > 0 ? (
+                            <div className="space-y-4">
+                                {user.addresses.map((addr: any, idx: number) => (
+                                    <div key={idx} className="flex items-start justify-between gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100 group">
+                                        <div className="flex items-start gap-3">
+                                            <MapPin className="text-primary mt-1 flex-shrink-0" size={18} />
+                                            <div>
+                                                <div className="font-bold text-gray-900">{addr.label || addr.name || 'Adresse'}</div>
+                                                <div className="text-gray-600 text-sm">
+                                                    {addr.street}<br />
+                                                    {addr.postal_code || addr.postalCode} {addr.city}
+                                                </div>
+                                                {addr.additional_info && (
+                                                    <div className="text-xs text-gray-400 mt-1 italic">
+                                                        Note: {addr.additional_info}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => handleDeleteAddress(addr.id)}
+                                            className="text-gray-400 hover:text-red-500 p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            title="Supprimer cette adresse"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            !isAddingAddress && (
+                                <div className="text-center text-gray-400 py-4 italic">
+                                    Aucune adresse enregistrée.
+                                </div>
+                            )
+                        )}
+                    </div>
+                </div>
 
                 {/* Carte de Fidélité */}
-                <div className="mb-10">
+                <div>
                     <h2 className="text-xl font-bold text-gray-800 mb-4">Ma Fidélité</h2>
                     {settings?.loyalty_program ? (
                         <LoyaltyRewardCard

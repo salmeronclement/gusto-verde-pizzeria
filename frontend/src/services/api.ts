@@ -97,17 +97,12 @@ export const getProducts = async () => {
 };
 export const getPizzas = getProducts;
 
-export const submitOrder = async (
-  items: any[],
-  customerInfo: any,
-  mode: 'livraison' | 'emporter',
-  address?: any
-) => {
-  let firstName = customerInfo.first_name || '';
-  let lastName = customerInfo.last_name || '';
+export const submitOrder = async (items: any[], customer: any, mode: 'livraison' | 'emporter', address?: any, scheduledAt?: string | null) => {
+  let firstName = customer.first_name || '';
+  let lastName = customer.last_name || '';
 
-  if (!firstName && customerInfo.name) {
-    const parts = customerInfo.name.trim().split(' ');
+  if (!firstName && customer.name) {
+    const parts = customer.name.trim().split(' ');
     firstName = parts[0];
     lastName = parts.slice(1).join(' ') || '.';
   }
@@ -125,11 +120,12 @@ export const submitOrder = async (
     customer: {
       first_name: firstName,
       last_name: lastName,
-      phone: customerInfo.phone,
-      email: customerInfo.email
+      phone: customer.phone,
+      email: customer.email
     },
     mode,
-    comment: customerInfo.comment || null
+    comment: customer.comment || null,
+    scheduledAt: scheduledAt || null
   };
 
   const rewardItem = items.find(item => item.isReward);
@@ -138,7 +134,7 @@ export const submitOrder = async (
   }
 
   if (mode === 'livraison') {
-    const addr = address || customerInfo.address;
+    const addr = address || customer.address;
     if (addr) {
       payload.address = {
         street: addr.street,
@@ -305,7 +301,7 @@ export const getAdminSettings = async () => {
 };
 
 export const updateAdminSettings = async (settings: any) => {
-  const response = await api.post('/admin/settings', settings);
+  const response = await api.put('/admin/settings', settings);
   return response.data;
 };
 
@@ -346,7 +342,13 @@ export const removeDriver = async (id: number) => {
 
 export const getAdminProducts = async () => {
   const response = await api.get('/admin/products');
-  return response.data;
+  const data = response.data;
+  const products = Array.isArray(data) ? data : [];
+
+  return products.map((p: any) => ({
+    ...p,
+    imageUrl: p.imageUrl || p.image_url || p.image || null
+  }));
 };
 
 export const createProduct = async (data: FormData) => {
@@ -371,7 +373,10 @@ export const bulkUpdateProducts = async (payload: any) => {
 
 export const getServiceDetails = async (serviceId?: number) => {
   try {
-    const url = serviceId ? `/admin/service/${serviceId}` : '/admin/service/details';
+    // CORRECTION : La route pour les détails d'un vieux service est /admin/service/history/:id
+    // Pour le service actuel (ou stats), c'est /admin/service/status ou /admin/service/details (à vérifier)
+    // Ici on parle de l'historique principalement :
+    const url = serviceId ? `/admin/service/history/${serviceId}` : '/admin/service/status';
     const response = await api.get(url);
     return response.data;
   } catch (e) {
@@ -381,7 +386,7 @@ export const getServiceDetails = async (serviceId?: number) => {
 
 export const getServiceHistory = async () => {
   try {
-    const response = await api.get('/admin/history');
+    const response = await api.get('/admin/service/history');
     return response.data;
   } catch (e) {
     return [];
@@ -397,6 +402,23 @@ export const getPublicSettings = async () => {
     console.error("Erreur chargement settings publics:", e);
     return {};
   }
+};
+
+// --- ADMIN / CLIENTS ---
+
+export const getAdminCustomers = async () => {
+  const response = await api.get('/admin/customers');
+  return response.data;
+};
+
+export const updateCustomerLoyalty = async (id: number, points: number) => {
+  const response = await api.patch(`/admin/customers/${id}/loyalty`, { loyalty_points: points });
+  return response.data;
+};
+
+export const getAdminCustomerDetails = async (id: number) => {
+  const response = await api.get(`/admin/customers/${id}`);
+  return response.data;
 };
 
 // --- LIVREUR ---

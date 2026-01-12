@@ -14,12 +14,12 @@ interface LoyaltyRewardCardProps {
 export default function LoyaltyRewardCard({ user, settings, cartItems, onAddReward }: LoyaltyRewardCardProps) {
     const { removeItem } = useCartStore();
     const [eligiblePizzas, setEligiblePizzas] = useState<Product[]>([]);
-    
+
     // Points et éligibilité
     const points = user.loyalty_points || 0;
     const target = settings?.target_pizzas || 10;
     const isEligible = points >= target;
-    
+
     // Calcul de la progression
     const progress = Math.min((points / target) * 100, 100);
     const remaining = Math.max(target - points, 0);
@@ -36,16 +36,16 @@ export default function LoyaltyRewardCard({ user, settings, cartItems, onAddRewa
     // Chargement des produits éligibles
     useEffect(() => {
         getProducts().then((all: any) => {
-            const eligible = Array.isArray(all) ? all.filter((p: any) => 
-                p.category.includes('pizza') && 
+            const eligible = Array.isArray(all) ? all.filter((p: any) =>
+                p.category.includes('pizza') &&
                 (p.is_loyalty_eligible === true || p.is_loyalty_eligible === 1)
             ) : [];
-            
+
             // Fallback: si aucune pizza marquée, on prend toutes les pizzas
             if (eligible.length === 0 && Array.isArray(all)) {
-                 setEligiblePizzas(all.filter((p: any) => p.category.includes('pizza')));
+                setEligiblePizzas(all.filter((p: any) => p.category.includes('pizza')));
             } else {
-                 setEligiblePizzas(eligible);
+                setEligiblePizzas(eligible);
             }
         });
     }, []);
@@ -68,65 +68,66 @@ export default function LoyaltyRewardCard({ user, settings, cartItems, onAddRewa
     };
 
     return (
-        <div className="bg-gradient-to-r from-forest to-green-800 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden mb-8">
-            {/* Background Pattern */}
-            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white opacity-10 rounded-full blur-xl"></div>
-            <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-20 h-20 bg-yellow-400 opacity-10 rounded-full blur-xl"></div>
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 relative overflow-hidden mb-8">
+            {/* Background Pattern - Subtle */}
+            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-primary/5 rounded-full blur-xl"></div>
+            <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-20 h-20 bg-primary/5 rounded-full blur-xl"></div>
 
             <div className="relative z-10">
                 <div className="flex justify-between items-start mb-6">
                     <div>
-                        <h3 className="text-lg font-bold flex items-center gap-2">
-                            <Gift className="text-yellow-400" size={20} />
+                        <h3 className="text-lg font-bold flex items-center gap-2 text-gray-900">
+                            <Gift className="text-primary" size={20} />
                             Programme Fidélité
                         </h3>
-                        <p className="text-green-100 text-sm">Gusto Verde Family</p>
+                        <p className="text-gray-500 text-sm">Gusto Verde Family</p>
                     </div>
                     <div className="text-right">
-                        <span className="text-3xl font-bold text-yellow-400">{points}</span>
-                        <span className="text-sm text-green-100 block">points</span>
+                        <span className="text-3xl font-bold text-primary">{points}</span>
+                        <span className="text-sm text-gray-400 block">points</span>
                     </div>
                 </div>
 
                 {/* Progress Bar */}
                 <div className="mb-6">
-                    <div className="flex justify-between text-xs text-green-100 mb-1">
+                    <div className="flex justify-between text-xs text-gray-500 mb-1">
                         <span>Progression</span>
                         <span>{points}/{target}</span>
                     </div>
-                    <div className="h-3 bg-black/20 rounded-full overflow-hidden backdrop-blur-sm">
-                        <div 
-                            className="h-full bg-yellow-400 rounded-full transition-all duration-1000 ease-out relative"
+                    <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-primary rounded-full transition-all duration-1000 ease-out relative"
                             style={{ width: `${progress}%` }}
                         >
-                            <div className="absolute top-0 right-0 bottom-0 w-1 bg-white/50 animate-pulse"></div>
+                            {/* Subtle shine effect */}
+                            <div className="absolute top-0 right-0 bottom-0 w-1 bg-white/30"></div>
                         </div>
                     </div>
                 </div>
 
                 {/* Zone d'action (Sélection ou Info) */}
                 {isEligible ? (
-                    <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
                         {isLocked ? (
                             <div className="flex items-start gap-3">
-                                <Lock className="text-gray-300 mt-1 flex-shrink-0" size={20} />
+                                <Lock className="text-gray-400 mt-1 flex-shrink-0" size={20} />
                                 <div>
-                                    <p className="font-bold text-white text-sm">Récompense débloquée ! 🔓</p>
-                                    <p className="text-green-100 text-xs mt-1">
+                                    <p className="font-bold text-gray-800 text-sm">Récompense débloquée ! 🔓</p>
+                                    <p className="text-gray-500 text-xs mt-1">
                                         Ajoutez d'abord une pizza payante au panier pour pouvoir sélectionner votre cadeau.
                                     </p>
                                 </div>
                             </div>
                         ) : (
                             <div>
-                                <label className="block text-sm font-bold text-yellow-400 mb-2">
+                                <label className="block text-sm font-bold text-gray-700 mb-2">
                                     Félicitations ! Choisissez votre pizza offerte :
                                 </label>
                                 <div className="relative">
                                     <select
                                         value={selectedRewardId}
                                         onChange={handleRewardChange}
-                                        className="w-full p-3 pl-4 pr-10 rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-yellow-400 outline-none text-sm font-medium cursor-pointer appearance-none"
+                                        className="w-full p-3 pl-4 pr-10 rounded-lg text-gray-900 bg-white border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm font-medium cursor-pointer appearance-none"
                                     >
                                         <option value="none">-- Cliquez pour choisir --</option>
                                         {eligiblePizzas.map(pizza => (
@@ -135,12 +136,12 @@ export default function LoyaltyRewardCard({ user, settings, cartItems, onAddRewa
                                             </option>
                                         ))}
                                     </select>
-                                    <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500">
+                                    <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-400">
                                         <Gift size={16} />
                                     </div>
                                 </div>
                                 {selectedRewardId !== 'none' && (
-                                    <div className="mt-3 flex items-center gap-2 text-sm text-green-200 animate-pulse">
+                                    <div className="mt-3 flex items-center gap-2 text-sm text-green-600 font-medium animate-pulse">
                                         <Check size={16} /> Pizza ajoutée au panier !
                                     </div>
                                 )}
@@ -149,18 +150,18 @@ export default function LoyaltyRewardCard({ user, settings, cartItems, onAddRewa
                     </div>
                 ) : (
                     /* Info Text si pas assez de points */
-                    <div className="flex items-center gap-3 bg-white/10 rounded-lg p-3 backdrop-blur-sm border border-white/10">
-                        <div className="bg-yellow-400/20 p-2 rounded-full">
-                            <Star className="text-yellow-400" size={16} fill="currentColor" />
+                    <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-3 border border-gray-100">
+                        <div className="bg-primary/20 p-2 rounded-full">
+                            <Star className="text-primary" size={16} fill="currentColor" />
                         </div>
-                        <p className="text-sm">
-                            Plus que <span className="font-bold text-yellow-400">{remaining} commandes</span> pour votre pizza offerte !
+                        <p className="text-sm text-gray-600">
+                            Plus que <span className="font-bold text-primary">{remaining} commandes</span> pour votre pizza offerte !
                         </p>
                     </div>
                 )}
 
                 {/* User Name Footer */}
-                <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-center text-xs text-green-200 font-mono uppercase tracking-wider">
+                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center text-xs text-gray-400 font-mono uppercase tracking-wider">
                     <span>{user.first_name} {user.last_name}</span>
                     <span>#{String(user.id).padStart(6, '0')}</span>
                 </div>

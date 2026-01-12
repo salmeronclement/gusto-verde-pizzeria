@@ -12,7 +12,7 @@ router.post('/', async (req, res) => {
 
     // On récupère items, customer, address, etc.
     // Note : on ignore le 'unitPrice' envoyé par le client pour le calcul final (sécurité)
-    const { customer, address, mode, items, deliveryFee, rewardPizzaId, comment } = req.body;
+    const { customer, address, mode, items, deliveryFee, rewardPizzaId, comment, scheduledAt } = req.body;
 
     if (!customer || !items || items.length === 0) {
         console.log("❌ Missing data");
@@ -36,6 +36,17 @@ router.post('/', async (req, res) => {
         const [services] = await promiseDb.query("SELECT id FROM services WHERE status = 'open' LIMIT 1");
         if (services.length > 0) {
             serviceId = services[0].id;
+        }
+
+        // Logic Planification : Si commandé pour un autre jour, on ne rattache PAS au service actuel
+        if (scheduledAt) {
+            const sDate = new Date(scheduledAt);
+            const now = new Date();
+            // Si la date (Jour/Mois/Année) est différente d'aujourd'hui, c'est une commande future
+            if (sDate.toLocaleDateString() !== now.toLocaleDateString()) {
+                console.log("📅 Commande planifiée future : Detached from current serviceId");
+                serviceId = null;
+            }
         }
 
         const [settingsRows] = await promiseDb.query("SELECT setting_key, setting_value FROM site_settings WHERE setting_key IN ('loyalty_program', 'delivery_zones', 'delivery_fees', 'free_delivery_threshold')");
@@ -300,8 +311,8 @@ router.post('/', async (req, res) => {
 
         // Insertion Commande
         const [orderResult] = await promiseDb.query(
-            'INSERT INTO orders (customer_id, address_id, mode, status, total_amount, delivery_fee, service_id, comment, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())',
-            [customerId, addressId, mode, 'en_attente', totalAmount, finalDeliveryFee, serviceId, comment || null]
+            'INSERT INTO orders (customer_id, address_id, mode, status, total_amount, delivery_fee, service_id, comment, created_at, scheduled_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)',
+            [customerId, addressId, mode, 'en_attente', totalAmount, finalDeliveryFee, serviceId, comment || null, scheduledAt || null]
         );
         const orderId = orderResult.insertId;
 

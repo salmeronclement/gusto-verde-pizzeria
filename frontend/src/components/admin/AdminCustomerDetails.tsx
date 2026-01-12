@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getAdminCustomerDetails } from '../../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Phone, Mail, Gift, Calendar, ShoppingBag, Truck, Package } from 'lucide-react';
 
@@ -43,39 +44,11 @@ export default function AdminCustomerDetails({ customerId, onClose }: AdminCusto
         fetchCustomerDetails();
     }, [customerId]);
 
-    const getAuthHeaders = () => {
-        // Récupérer le token depuis le store Zustand persist
-        let token = null;
-        const adminStorage = localStorage.getItem('admin-storage');
-        if (adminStorage) {
-            try {
-                const { state } = JSON.parse(adminStorage);
-                if (state && state.token) {
-                    token = state.token;
-                }
-            } catch (e) {
-                console.error('Error parsing admin token:', e);
-            }
-        }
-        return {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        };
-    };
-
     const fetchCustomerDetails = async () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`http://51.68.229.173/api/admin/customers/${customerId}`, {
-                headers: getAuthHeaders()
-            });
-
-            if (!response.ok) {
-                throw new Error('Erreur lors de la récupération des données');
-            }
-
-            const data = await response.json();
+            const data = await getAdminCustomerDetails(customerId);
             setCustomer(data.customer);
             setOrders(data.orders || []);
         } catch (err) {

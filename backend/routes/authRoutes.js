@@ -50,7 +50,15 @@ router.post('/register', async (req, res) => {
         res.status(201).json({
             message: 'Inscription réussie',
             token,
-            user: { id: result.insertId, name: `${firstName} ${lastName}`, email, role: 'client', loyalty_points: 0 }
+            user: {
+                id: result.insertId,
+                first_name: firstName,
+                last_name: lastName,
+                name: `${firstName} ${lastName}`,
+                email,
+                role: 'client',
+                loyalty_points: 0
+            }
         });
 
     } catch (error) {
@@ -104,6 +112,8 @@ router.post('/login', async (req, res) => {
             token,
             user: {
                 id: user.id,
+                first_name: user.first_name,
+                last_name: user.last_name,
                 name: `${user.first_name} ${user.last_name}`,
                 email: user.email,
                 phone: user.phone,
@@ -140,6 +150,8 @@ router.get('/me', authMiddleware, async (req, res) => {
 
         res.json({
             id: user.id,
+            first_name: user.first_name,
+            last_name: user.last_name,
             name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Client',
             email: user.email,
             phone: user.phone,
@@ -162,11 +174,17 @@ router.get('/me', authMiddleware, async (req, res) => {
 
 // PUT /api/auth/me (Update Profile)
 router.put('/me', authMiddleware, async (req, res) => {
-    const { firstName, lastName, email, phone } = req.body;
+    // Frontend sends first_name/last_name (snake_case) or firstName/lastName (camelCase)
+    const { firstName, lastName, first_name, last_name, email, phone } = req.body;
+
+    // Prioritize snake_case if present (standard naming in this project's DB), fallback to camelCase
+    const fName = first_name || firstName;
+    const lName = last_name || lastName;
+
     try {
         await promiseDb.query(
             'UPDATE customers SET first_name = ?, last_name = ?, email = ?, phone = ? WHERE id = ?',
-            [firstName, lastName, email, phone, req.user.id]
+            [fName, lName, email, phone, req.user.id]
         );
         res.json({ success: true, message: 'Profil mis à jour' });
     } catch (error) {
@@ -360,6 +378,8 @@ router.post('/client/verify-code', async (req, res) => {
             token,
             user: {
                 id: customer.id,
+                first_name: customer.first_name,
+                last_name: customer.last_name,
                 name: userName,
                 email: customer.email,
                 phone: customer.phone,

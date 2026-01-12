@@ -45,7 +45,7 @@ export interface Product {
   is_promo_eligible?: boolean;
   isPromoEligible?: boolean;
   // Champs liés à la fidélité dans l'API
-  is_loyalty_eligible?: boolean | number; 
+  is_loyalty_eligible?: boolean | number;
   available?: boolean;
   ingredients?: string[];
   is_featured?: boolean;
@@ -54,12 +54,12 @@ export interface Product {
 export interface CartItem extends Product {
   quantity: number;
   notes?: string;
-  productId: number | string; 
-  unitPrice: number; 
+  productId: number | string;
+  unitPrice: number;
   subtotal: number;
   isFree?: boolean;
   isReward?: boolean;
-  unit_price?: number; 
+  unit_price?: number;
   product_name?: string;
 }
 
@@ -72,66 +72,68 @@ export interface Driver {
   phone: string;
   current_status: string;
   is_active?: boolean;
+  created_at?: string;
 }
 
 export interface Order {
-    id: number;
-    created_at: string;
-    createdAt?: string; 
-    status: OrderStatus;
-    total_amount: number | string;
-    total?: number;
-    mode: 'livraison' | 'emporter';
-    customer_id?: number;
-    items: any[]; 
-    customer?: any;
-    customerInfo?: any;
-    delivery?: any;
-    item_count?: number;
-    comment?: string;
-    scheduledTime?: string;
-    delivery_fee?: number | string;
-    delivery_address?: any;
+  id: number;
+  created_at: string;
+  createdAt?: string;
+  status: OrderStatus;
+  total_amount: number | string;
+  total?: number;
+  mode: 'livraison' | 'emporter';
+  customer_id?: number;
+  items: any[];
+  customer?: any;
+  customerInfo?: any;
+  delivery?: any;
+  item_count?: number;
+  comment?: string;
+  scheduledTime?: string;
+  scheduled_at?: string;
+  delivery_fee?: number | string;
+  delivery_address?: any;
 }
 
 // --- TYPES SPÉCIFIQUES ---
 
-export interface AdminOrder extends Order {}
-export interface DriverOrder extends Order {}
+export interface AdminOrder extends Order { }
+export interface DriverOrder extends Order { }
 
 export interface ServiceDetails {
-    isOpen: boolean;
-    stats?: {
-        topItems: any[];
-        revenue?: number;
-        orderCount?: number;
-        averageTicket?: number;
-    };
-    service?: any;
-    orders?: any[];
+  isOpen: boolean;
+  stats?: {
+    topItems: any[];
+    revenue?: number;
+    orderCount?: number;
+    averageTicket?: number;
+  };
+  service?: any;
+  orders?: any[];
 }
 
 export interface Service {
-    id: number;
-    status: 'open' | 'closed';
-    start_time?: string;
-    end_time?: string;
-    total_revenue?: number;
-    order_count?: number;
-    average_ticket?: number;
+  id: number;
+  status: 'open' | 'closed';
+  start_time?: string;
+  end_time?: string;
+  total_revenue?: number;
+  order_count?: number;
+  average_ticket?: number;
 }
 
 export interface OrderTracking extends Order {
-    eta?: string;
-    driverLocation?: { lat: number; lng: number };
+  eta?: string;
+  driverLocation?: { lat: number; lng: number };
 }
 
 // CORRECTION ICI : Mise à jour pour correspondre à l'usage réel
 export interface LoyaltyProgram {
-    enabled: boolean;
-    target_pizzas: number; // Au lieu de reward_threshold
-    require_purchase_for_reward?: boolean;
-    // Champs optionnels pour compatibilité si nécessaire
-    points_per_euro?: number;
-    reward_threshold?: number;
+  enabled: boolean;
+  target_pizzas: number; // Au lieu de reward_threshold
+  require_purchase_for_reward?: boolean;
+  // Champs optionnels pour compatibilité si nécessaire
+  points_per_euro?: number;
+  reward_threshold?: number;
 }

@@ -10,7 +10,7 @@ const AdminDriversPage: React.FC = () => {
     const [editingId, setEditingId] = useState<number | null>(null);
 
     // Form states
-    const [newDriver, setNewDriver] = useState({ first_name: '', last_name: '', phone: '', username: '', password: '' });
+    const [newDriver, setNewDriver] = useState({ first_name: '', last_name: '', phone: '' });
     const [editForm, setEditForm] = useState({ first_name: '', last_name: '', phone: '' });
     const [formError, setFormError] = useState<string | null>(null);
 
@@ -32,13 +32,9 @@ const AdminDriversPage: React.FC = () => {
         fetchDrivers();
     }, []);
 
-    const validateForm = (form: { first_name: string; last_name: string; phone: string; username?: string; password?: string }) => {
+    const validateForm = (form: { first_name: string; last_name: string; phone: string }) => {
         if (!form.first_name || !form.last_name || !form.phone) {
             return 'Tous les champs (Nom, Prénom, Tel) sont obligatoires.';
-        }
-        if (isCreating && (!form.username || !form.password)) {
-            //@ts-ignore
-            if (!form.username || !form.password) return 'Identifiant et mot de passe requis pour la création.';
         }
         const normalizedPhone = form.phone.replace(/\D/g, '');
         if (normalizedPhone.length !== 10) {
@@ -58,9 +54,15 @@ const AdminDriversPage: React.FC = () => {
         }
 
         try {
-            const created = await createDriver(newDriver);
-            setDrivers(prev => [created, ...prev]);
-            setNewDriver({ first_name: '', last_name: '', phone: '', username: '', password: '' });
+            const response = await createDriver(newDriver);
+            const createdDriver: Driver = {
+                id: response.id,
+                ...newDriver,
+                is_active: true,
+                created_at: new Date().toISOString()
+            };
+            setDrivers(prev => [createdDriver, ...prev]);
+            setNewDriver({ first_name: '', last_name: '', phone: '' });
             setIsCreating(false);
         } catch (err: any) {
             console.error('Error creating driver:', err);
@@ -154,7 +156,7 @@ const AdminDriversPage: React.FC = () => {
                                         required
                                         value={newDriver.first_name}
                                         onChange={e => setNewDriver({ ...newDriver, first_name: e.target.value })}
-                                        className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary"
+                                        className="w-full px-4 py-2 rounded-lg border-gray-300 focus:ring-primary focus:border-primary"
                                     />
                                 </div>
                                 <div className="flex-1 min-w-[200px]">
@@ -164,7 +166,7 @@ const AdminDriversPage: React.FC = () => {
                                         required
                                         value={newDriver.last_name}
                                         onChange={e => setNewDriver({ ...newDriver, last_name: e.target.value })}
-                                        className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary"
+                                        className="w-full px-4 py-2 rounded-lg border-gray-300 focus:ring-primary focus:border-primary"
                                     />
                                 </div>
                                 <div className="flex-1 min-w-[200px]">
@@ -174,34 +176,11 @@ const AdminDriversPage: React.FC = () => {
                                         required
                                         value={newDriver.phone}
                                         onChange={e => setNewDriver({ ...newDriver, phone: e.target.value })}
-                                        className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary"
+                                        className="w-full px-4 py-2 rounded-lg border-gray-300 focus:ring-primary focus:border-primary"
                                         placeholder="0612345678"
                                     />
                                 </div>
-                                <div className="flex-1 min-w-[200px]">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Identifiant</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={newDriver.username}
-                                        onChange={e => setNewDriver({ ...newDriver, username: e.target.value })}
-                                        className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary"
-                                        placeholder="ex: mario"
-                                        autoComplete="off"
-                                    />
-                                </div>
-                                <div className="flex-1 min-w-[200px]">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
-                                    <input
-                                        type="password"
-                                        required
-                                        value={newDriver.password}
-                                        onChange={e => setNewDriver({ ...newDriver, password: e.target.value })}
-                                        className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary"
-                                        placeholder="••••••"
-                                        autoComplete="new-password"
-                                    />
-                                </div>
+
                                 <button
                                     type="submit"
                                     className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -264,13 +243,13 @@ const AdminDriversPage: React.FC = () => {
                                                     <input
                                                         value={editForm.first_name}
                                                         onChange={e => setEditForm({ ...editForm, first_name: e.target.value })}
-                                                        className="w-32 text-sm rounded border-gray-300"
+                                                        className="w-32 px-2 py-1 text-sm rounded border-gray-300"
                                                         placeholder="Prénom"
                                                     />
                                                     <input
                                                         value={editForm.last_name}
                                                         onChange={e => setEditForm({ ...editForm, last_name: e.target.value })}
-                                                        className="w-32 text-sm rounded border-gray-300"
+                                                        className="w-32 px-2 py-1 text-sm rounded border-gray-300"
                                                         placeholder="Nom"
                                                     />
                                                 </div>
@@ -290,7 +269,7 @@ const AdminDriversPage: React.FC = () => {
                                                 <input
                                                     value={editForm.phone}
                                                     onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
-                                                    className="w-40 text-sm rounded border-gray-300"
+                                                    className="w-40 px-2 py-1 text-sm rounded border-gray-300"
                                                 />
                                             ) : (
                                                 <div className="flex items-center gap-2 text-gray-600">

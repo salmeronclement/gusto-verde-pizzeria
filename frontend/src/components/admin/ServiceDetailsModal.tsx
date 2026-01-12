@@ -116,8 +116,9 @@ export default function ServiceDetailsModal({ serviceId, onClose }: ServiceDetai
                                 <table className="w-full text-sm text-left">
                                     <thead className="text-xs text-gray-500 uppercase bg-gray-50 sticky top-0">
                                         <tr>
+                                            <th className="px-4 py-2">Cmd #</th>
                                             <th className="px-4 py-2">Heure</th>
-                                            <th className="px-4 py-2">Client</th>
+                                            <th className="px-4 py-2">Tél.</th>
                                             <th className="px-4 py-2 text-right">Montant</th>
                                             <th className="px-4 py-2 text-center">Statut</th>
                                         </tr>
@@ -125,18 +126,21 @@ export default function ServiceDetailsModal({ serviceId, onClose }: ServiceDetai
                                     <tbody>
                                         {orders.map((order: any) => (
                                             <tr key={order.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50">
+                                                <td className="px-4 py-2 font-bold text-gray-900">
+                                                    #{order.id}
+                                                </td>
                                                 <td className="px-4 py-2 text-gray-500">
                                                     {new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </td>
-                                                <td className="px-4 py-2 font-medium">
-                                                    {order.customer ? `${order.customer.first_name} ${order.customer.last_name}` : 'Client'}
+                                                <td className="px-4 py-2 font-mono text-xs">
+                                                    {order.phone || order.customer?.phone || '-'}
                                                 </td>
                                                 <td className="px-4 py-2 text-right font-bold">
                                                     {formatPrice(order.total_amount || order.total)}
                                                 </td>
                                                 <td className="px-4 py-2 text-center">
                                                     <span className={`px-2 py-1 rounded-full text-xs ${order.status === 'livree' ? 'bg-green-100 text-green-700' :
-                                                            order.status === 'annulee' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                                                        order.status === 'annulee' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
                                                         }`}>
                                                         {order.status}
                                                     </span>

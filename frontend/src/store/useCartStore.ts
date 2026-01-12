@@ -55,17 +55,17 @@ export const useCartStore = create<CartState>()(
         if (existingItemIndex > -1) {
           const updatedItems = [...items];
           updatedItems[existingItemIndex].quantity += 1;
-          updatedItems[existingItemIndex].subtotal = updatedItems[existingItemIndex].quantity * updatedItems[existingItemIndex].unitPrice;
+          updatedItems[existingItemIndex].subtotal = Number(updatedItems[existingItemIndex].quantity) * Number(updatedItems[existingItemIndex].unitPrice);
           set({ items: updatedItems });
         } else {
           set({
             items: [...items, {
               ...newItem,
               quantity: 1,
-              subtotal: newItem.unitPrice,
+              subtotal: Number(newItem.unitPrice),
               isFree: isFree,
               isReward: isReward,
-              unitPrice: newItem.unitPrice
+              unitPrice: Number(newItem.unitPrice)
             }],
           });
         }
@@ -92,7 +92,7 @@ export const useCartStore = create<CartState>()(
         set((state) => ({
           items: state.items.map((item) =>
             String(item.productId) === String(productId) && (item.isFree === true) === isFree && (item.isReward === true) === isReward
-              ? { ...item, quantity, subtotal: quantity * item.unitPrice }
+              ? { ...item, quantity, subtotal: Number(quantity) * Number(item.unitPrice) }
               : item
           ),
         }));
@@ -112,12 +112,17 @@ export const useCartStore = create<CartState>()(
 
       getTotal: () => {
         const { items } = get();
-        return items.reduce((total, item) => total + (item.subtotal || 0), 0);
+        // Sécurisation du calcul TOTAL (Number obligatoire pour éviter la concaténation "10" + "20" = "1020")
+        return items.reduce((total, item) => {
+          // Si c'est gratuit ou reward, le prix est 0 de toute façon, mais on sécurise
+          const val = Number(item.subtotal || 0);
+          return total + (isNaN(val) ? 0 : val);
+        }, 0);
       },
 
       getItemCount: () => {
         const { items } = get();
-        return items.reduce((count, item) => count + item.quantity, 0);
+        return items.reduce((count, item) => count + Number(item.quantity || 0), 0);
       },
 
       getFreeItemAllowance: () => {
@@ -128,16 +133,16 @@ export const useCartStore = create<CartState>()(
             const cat = i.category.toLowerCase();
             return ['pizza', 'classique', 'signature', 'gourmande', 'base crème', 'base tomate'].some(k => cat.includes(k));
           })
-          .reduce((sum, i) => sum + i.quantity, 0);
+          .reduce((sum, i) => sum + Number(i.quantity || 0), 0);
 
         const settings = localStorage.getItem('pizzeria-settings');
         const promo = settings ? JSON.parse(settings).promo_offer : null;
 
         if (promo && promo.enabled) {
-          const sets = Math.floor(paidPizzas / promo.buy_quantity);
+          const sets = Math.floor(paidPizzas / Number(promo.buy_quantity));
           return {
-            allowed: sets * promo.get_quantity,
-            current: items.filter(i => i.isFree).reduce((sum, i) => sum + i.quantity, 0)
+            allowed: sets * Number(promo.get_quantity),
+            current: items.filter(i => i.isFree).reduce((sum, i) => sum + Number(i.quantity || 0), 0)
           };
         }
         return { allowed: 0, current: 0 };

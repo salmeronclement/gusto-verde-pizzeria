@@ -1,8 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { useSettingsStore } from '../store/useSettingsStore';
 
 export default function ContactPage() {
+    const { settings, fetchPublicSettings } = useSettingsStore();
+
+    React.useEffect(() => {
+        fetchPublicSettings();
+    }, []);
+
     return (
         <div className="min-h-screen bg-white">
             {/* Page Header */}
@@ -71,9 +78,16 @@ export default function ContactPage() {
                                     <div>
                                         <h3 className="font-bold text-lg mb-1">Horaires d'ouverture</h3>
                                         <div className="text-gray-600 space-y-1">
-                                            <p><span className="font-medium">Lundi - Vendredi :</span> 11:30 - 14:00</p>
-                                            <p><span className="font-medium">Lundi - Jeudi :</span> 17:30 - 22:00</p>
-                                            <p><span className="font-medium">Vendredi - Dimanche :</span> 17:30 - 22:15</p>
+                                            {settings && settings.schedule && settings.schedule.length > 0 ? (
+                                                settings.schedule.map((day: any) => (
+                                                    <div key={day.day} className="flex justify-between w-full max-w-[200px]">
+                                                        <span className="font-medium">{day.day} :</span>
+                                                        <span>{day.closed ? 'Fermé' : `${day.open} - ${day.close}`}</span>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <p>Horaires non disponibles</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

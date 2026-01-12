@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
     // 2. Commandes
     const [orders] = await promiseDb.query(`
             SELECT 
-                o.id, o.mode, o.status, o.total_amount, o.created_at, o.comment,
+                o.id, o.mode, o.status, o.total_amount, o.created_at, o.comment, o.scheduled_at,
                 c.first_name, c.last_name, c.phone,
                 a.street, a.postal_code, a.city,
                 d.driver_id, dr.first_name as driver_name
@@ -25,7 +25,12 @@ router.get('/', async (req, res) => {
             LEFT JOIN addresses a ON o.address_id = a.id
             LEFT JOIN deliveries d ON d.order_id = o.id
             LEFT JOIN drivers dr ON d.driver_id = dr.id
-            WHERE o.service_id = ? OR o.service_id IS NULL
+            WHERE o.service_id = ? 
+               OR (o.service_id IS NULL AND (
+                   (o.scheduled_at IS NOT NULL AND DATE(o.scheduled_at) = CURDATE()) 
+                   OR 
+                   (o.scheduled_at IS NULL AND DATE(o.created_at) = CURDATE())
+               ))
             ORDER BY o.created_at DESC
         `, [serviceId]);
 
@@ -48,6 +53,7 @@ router.get('/', async (req, res) => {
         mode: order.mode,
         comment: order.comment,
         created_at: order.created_at,
+        scheduled_at: order.scheduled_at, // Mapping
         customer: {
           first_name: order.first_name,
           last_name: order.last_name,

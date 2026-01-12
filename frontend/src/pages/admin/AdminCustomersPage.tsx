@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Users, Edit2, X, Save, TrendingUp, Award, Clock } from 'lucide-react';
+import { getAdminCustomers, updateCustomerLoyalty } from '../../services/api';
+import { Users, Edit2, X, Save, TrendingUp, Award, Clock, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AdminCustomerDetails from '../../components/admin/AdminCustomerDetails';
 
@@ -25,8 +26,15 @@ export default function AdminCustomersPage() {
     const [saving, setSaving] = useState(false);
     const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
     const [sortBy, setSortBy] = useState<SortType>('recent');
+    const [searchQuery, setSearchQuery] = useState('');
 
-    const sortedCustomers = [...customers].sort((a, b) => {
+    const filteredCustomers = customers.filter(c =>
+        (c.first_name + ' ' + c.last_name).toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.phone.includes(searchQuery)
+    );
+
+    const sortedCustomers = [...filteredCustomers].sort((a, b) => {
         switch (sortBy) {
             case 'top_spent':
                 return Number(b.total_spent) - Number(a.total_spent);
@@ -42,39 +50,9 @@ export default function AdminCustomersPage() {
         fetchCustomers();
     }, []);
 
-    const getAuthHeaders = () => {
-        // Récupérer le token depuis le store Zustand persist
-        let token = null;
-        const adminStorage = localStorage.getItem('admin-storage');
-        if (adminStorage) {
-            try {
-                const { state } = JSON.parse(adminStorage);
-                if (state && state.token) {
-                    token = state.token;
-                }
-            } catch (e) {
-                console.error('Error parsing admin token:', e);
-            }
-        }
-        return {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        };
-    };
-
     const fetchCustomers = async () => {
         try {
-            const response = await fetch('http://51.68.229.173/api/admin/customers', {
-                headers: getAuthHeaders()
-            });
-
-            if (!response.ok) {
-                console.error('API Error:', response.status);
-                setCustomers([]);
-                return;
-            }
-
-            const data = await response.json();
+            const data = await getAdminCustomers();
             // Ensure data is an array
             setCustomers(Array.isArray(data) ? data : []);
         } catch (error) {
@@ -95,28 +73,17 @@ export default function AdminCustomersPage() {
 
         setSaving(true);
         try {
-            const response = await fetch(
-                `http://51.68.229.173/api/admin/customers/${editingCustomer.id}/loyalty`,
-                {
-                    method: 'PATCH',
-                    headers: getAuthHeaders(),
-                    body: JSON.stringify({ loyalty_points: newPoints }),
-                }
-            );
+            await updateCustomerLoyalty(editingCustomer.id, newPoints);
 
-            if (response.ok) {
-                setCustomers(customers.map(c =>
-                    c.id === editingCustomer.id
-                        ? { ...c, loyalty_points: newPoints }
-                        : c
-                ));
-                setEditingCustomer(null);
-            } else {
-                alert('Erreur lors de la mise à jour');
-            }
+            setCustomers(customers.map(c =>
+                c.id === editingCustomer.id
+                    ? { ...c, loyalty_points: newPoints }
+                    : c
+            ));
+            setEditingCustomer(null);
         } catch (error) {
             console.error('Error updating loyalty:', error);
-            alert('Erreur de connexion');
+            alert('Erreur lors de la mise à jour (Connexion ou Serveur)');
         } finally {
             setSaving(false);
         }
@@ -132,7 +99,7 @@ export default function AdminCustomersPage() {
 
     return (
         <div>
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-3">
                     <div className="bg-primary/10 p-3 rounded-lg">
                         <Users className="text-primary" size={28} />
@@ -142,29 +109,50 @@ export default function AdminCustomersPage() {
                         <p className="text-gray-600">Gestion de la fidélité et des comptes clients</p>
                     </div>
                 </div>
-                {/* Sort Buttons */}
-                <div className="flex gap-2">
-                    <button
-                        onClick={() => setSortBy('recent')}
-                        className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors ${sortBy === 'recent' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                    >
-                        <Clock size={16} /> Récents
-                    </button>
-                    <button
-                        onClick={() => setSortBy('top_spent')}
-                        className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors ${sortBy === 'top_spent' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                    >
-                        <TrendingUp size={16} /> Top Clients
-                    </button>
-                    <button
-                        onClick={() => setSortBy('top_orders')}
-                        className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors ${sortBy === 'top_orders' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                    >
-                        <Award size={16} /> Plus Fidèles
-                    </button>
+
+                <div className="flex flex-col sm:flex-row gap-4 items-end sm:items-center">
+                    {/* Search Bar */}
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                        <input
+                            type="text"
+                            placeholder="Rechercher un client..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary w-full sm:w-64"
+                        />
+                    </div>
+
+                    {/* Sort Buttons */}
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setSortBy('recent')}
+                            className={`px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors ${sortBy === 'recent' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                            title="Récents"
+                        >
+                            <Clock size={16} />
+                            <span className="hidden xl:inline">Récents</span>
+                        </button>
+                        <button
+                            onClick={() => setSortBy('top_spent')}
+                            className={`px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors ${sortBy === 'top_spent' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                            title="Top Clients"
+                        >
+                            <TrendingUp size={16} />
+                            <span className="hidden xl:inline">Top Clients</span>
+                        </button>
+                        <button
+                            onClick={() => setSortBy('top_orders')}
+                            className={`px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors ${sortBy === 'top_orders' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                            title="Plus Fidèles"
+                        >
+                            <Award size={16} />
+                            <span className="hidden xl:inline">Plus Fidèles</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 

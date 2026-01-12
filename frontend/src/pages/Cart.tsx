@@ -7,21 +7,53 @@ import { Minus, Plus, Trash2, ShoppingBag, Gift } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getProducts } from '../services/api';
 import { Product } from '../types';
+import LoyaltyRewardCard from '../components/LoyaltyRewardCard';
+import { useAuthStore } from '../store/useAuthStore';
 
 export const Cart: React.FC = () => {
     const navigate = useNavigate();
+    const { user } = useAuthStore();
+    const { settings, fetchPublicSettings } = useSettingsStore();
+
+    // Derived state
+    const promo = settings?.promo_offer;
+
     const {
         items,
         addItem,
-        updateQuantity,
         removeItem,
-        getTotal,
-        recalculatePromos,
-        getFreeItemAllowance,
+        updateQuantity,
         updateItemNotes,
+        getTotal,
+        getFreeItemAllowance,
+        orderComment,
+        setOrderComment
     } = useCartStore();
 
-    const { settings, fetchPublicSettings } = useSettingsStore();
+    // Auto-remove reward if not eligible anymore
+    useEffect(() => {
+        const rewardItem = items.find(i => i.isReward);
+        if (rewardItem) {
+            // 1. Must be logged in
+            if (!user) {
+                removeItem(rewardItem.productId);
+                return;
+            }
+            // 2. Loyalty must be enabled
+            if (!settings?.loyalty_program?.enabled) {
+                removeItem(rewardItem.productId);
+                return;
+            }
+            // 3. Must have enough points
+            const points = user.loyalty_points || 0;
+            const target = settings.loyalty_program.target_pizzas || 10;
+            if (points < target) {
+                console.log("Removing reward: insufficient points", points);
+                removeItem(rewardItem.productId);
+            }
+        }
+    }, [items, user, settings, removeItem]);
+
     const [products, setProducts] = React.useState<Product[]>([]);
     const [allProducts, setAllProducts] = React.useState<Product[]>([]);
 
@@ -30,7 +62,7 @@ export const Cart: React.FC = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
         fetchPublicSettings();
-        recalculatePromos();
+
 
         getProducts().then((all: any) => {
             setAllProducts(all);
@@ -47,7 +79,7 @@ export const Cart: React.FC = () => {
     const minOrder = settings?.min_order || 0;
     const isMinOrderMet = total >= minOrder;
 
-    const promo = settings?.promo_offer;
+
     const isCartEmpty = items.length === 0;
 
     if (isCartEmpty) {
@@ -82,6 +114,26 @@ export const Cart: React.FC = () => {
                 <h1 className="font-display text-5xl font-bold text-dark mb-10">
                     Votre Panier
                 </h1>
+
+                {/* Loyalty Reward Section */}
+                {user && settings?.loyalty_program?.enabled && (
+                    <LoyaltyRewardCard
+                        user={user}
+                        settings={settings.loyalty_program}
+                        cartItems={items}
+                        onAddReward={(product) => {
+                            addItem({
+                                ...product,
+                                productId: String(product.id),
+                                price: 0,
+                                unitPrice: 0,
+                                quantity: 1,
+                                isReward: true,
+                                isFree: false // Explicitly NOT an offer item, but a reward
+                            } as any);
+                        }}
+                    />
+                )}
 
                 {/* Dynamic Promo Banner */}
                 {promo?.enabled && (

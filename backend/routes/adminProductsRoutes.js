@@ -112,6 +112,7 @@ router.put('/:id', verifyAdminToken, upload.single('image'), async (req, res) =>
 router.patch('/bulk', verifyAdminToken, async (req, res) => {
     try {
         const { productIds, updates } = req.body;
+        console.log('Bulk Update Request:', { productIds, updates });
 
         if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
             return res.status(400).json({ error: 'Aucun produit sélectionné' });
@@ -132,8 +133,8 @@ router.patch('/bulk', verifyAdminToken, async (req, res) => {
         const setClause = keys.map(key => `${key} = ?`).join(', ');
         const values = [...keys.map(key => updates[key]), productIds];
 
-        // This query syntax for IN clause with array might need specific handling depending on driver
-        // Usually 'WHERE id IN (?)' works with mysql2 if passed as [ [id1, id2] ]
+        console.log('Executing Query:', `UPDATE products SET ${setClause} WHERE id IN (?)`, values);
+
         await promiseDb.query(
             `UPDATE products SET ${setClause} WHERE id IN (?)`,
             values

@@ -72,7 +72,7 @@ const AdminOrdersPage: React.FC = () => {
       // Polling toutes les 30 sec pour actualisation auto sans spam
       const interval = setInterval(() => {
         fetchOrders(true);
-      }, 30000); 
+      }, 30000);
       return () => clearInterval(interval);
     } else {
       // Si fermé, on vide la liste
@@ -171,7 +171,7 @@ const AdminOrdersPage: React.FC = () => {
             </span>
           </h1>
         </div>
-        
+
         <div className="flex gap-2">
           {/* Bouton Tout Supprimer */}
           {orders.length > 0 && (
@@ -235,6 +235,14 @@ const AdminOrdersPage: React.FC = () => {
                       💬 Note
                     </span>
                   )}
+
+                  {/* Badge Planifié */}
+                  {order.scheduled_at && (
+                    <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full font-bold flex items-center gap-1">
+                      <Clock size={12} />
+                      {new Date(order.scheduled_at).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -278,6 +286,11 @@ const AdminOrdersPage: React.FC = () => {
                           <div style="font-size:18px;font-weight:bold;">#${order.id}</div>
                           <div style="font-size:10px;">${formatDate(order.created_at)}</div>
                         </div>
+                        ${order.scheduled_at ? `
+                        <div style="text-align:center;margin-bottom:8px;font-weight:bold;border:2px solid #000;padding:4px;">
+                          PLANIFIÉ POUR :<br/>${formatDate(order.scheduled_at)}
+                        </div>
+                        ` : ''}
                         <div style="text-align:center;font-size:18px;font-weight:bold;padding:8px;border:2px solid #000;margin-bottom:10px;">${order.mode === 'livraison' ? 'LIVRAISON' : 'A EMPORTER'}</div>
                         <div style="margin-bottom:8px;"><div style="font-weight:bold;font-size:14px;">${order.customer.first_name} ${order.customer.last_name}</div><div style="font-size:12px;">${order.customer.phone}</div></div>
                         <div style="border-bottom:1px dashed #000;margin-bottom:8px;"></div>

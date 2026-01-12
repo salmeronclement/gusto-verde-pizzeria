@@ -59,7 +59,7 @@ const OrderRecap: React.FC = () => {
                 email: user.email || '',
                 address: (user.addresses && user.addresses.length > 0) ? {
                     street: user.addresses[0].street,
-                    postalCode: user.addresses[0].postalCode || user.addresses[0].postal_code,
+                    postalCode: user.addresses[0].postal_code || '',
                     city: user.addresses[0].city,
                     additionalInfo: user.addresses[0].additional_info || ''
                 } : prev.address

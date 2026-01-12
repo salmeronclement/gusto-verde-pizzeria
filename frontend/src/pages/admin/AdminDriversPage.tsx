@@ -57,10 +57,12 @@ const AdminDriversPage: React.FC = () => {
             const response = await createDriver(newDriver);
             const createdDriver: Driver = {
                 id: response.id,
-                ...newDriver,
+                current_status: 'available',
                 is_active: true,
-                created_at: new Date().toISOString()
+                created_at: new Date().toISOString(),
+                ...newDriver
             };
+
             setDrivers(prev => [createdDriver, ...prev]);
             setNewDriver({ first_name: '', last_name: '', phone: '' });
             setIsCreating(false);

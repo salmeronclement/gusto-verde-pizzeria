@@ -35,6 +35,12 @@ import AdminCustomersPage from './pages/admin/AdminCustomersPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 import AdminLoginPage from './pages/auth/AdminLoginPage';
 
+// Pages Livreur
+import DriverLoginPage from './pages/driver/DriverLoginPage';
+import DriverDashboardPage from './pages/driver/DriverDashboardPage';
+import DriverHistoryPage from './pages/driver/DriverHistoryPage';
+import DriverLayout from './components/layout/DriverLayout'; // Need to check if this exists
+
 // Store
 import { useAuthStore } from './store/useAuthStore';
 
@@ -99,6 +105,16 @@ function App() {
         <Route path="blog" element={<AdminBlogPage />} />
         <Route path="clients" element={<AdminCustomersPage />} />
         <Route path="parametres" element={<AdminSettingsPage />} />
+        <Route path="clients" element={<AdminCustomersPage />} />
+        <Route path="parametres" element={<AdminSettingsPage />} />
+      </Route>
+
+      {/* --- ROUTES LIVREUR (Standalone) --- */}
+      <Route path="/livreur/login" element={<DriverLoginPage />} />
+      <Route path="/livreur" element={<DriverLayout />}>
+        <Route index element={<Navigate to="/livreur/dashboard" replace />} />
+        <Route path="dashboard" element={<DriverDashboardPage />} />
+        <Route path="historique" element={<DriverHistoryPage />} />
       </Route>
 
       {/* --- CATCH ALL (Redirection 404 vers accueil) --- */}

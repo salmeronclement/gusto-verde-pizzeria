@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { Bike, History, LogOut, Circle, Moon, Sun } from 'lucide-react';
 // Correction de l'import : on utilise updateDriver au lieu de updateDriverStatus
 import { getDriverProfile, updateDriver } from '../../services/api';
 
-export default function DriverLayout({ children }: { children: React.ReactNode }) {
+export default function DriverLayout() {
     const location = useLocation();
     const navigate = useNavigate();
     const [status, setStatus] = useState<'active' | 'pause' | 'inactive'>('inactive');
@@ -44,7 +43,7 @@ export default function DriverLayout({ children }: { children: React.ReactNode }
             }
         };
         loadStatus();
-        
+
         // Rafraîchissement périodique
         const interval = setInterval(loadStatus, 30000);
         return () => clearInterval(interval);
@@ -135,7 +134,7 @@ export default function DriverLayout({ children }: { children: React.ReactNode }
 
             {/* Zone de Contenu (Padding pour Header et Footer) */}
             <main className="flex-1 pt-16 pb-20 px-4 overflow-y-auto">
-                {children}
+                <Outlet />
             </main>
 
             {/* Navigation Fixe (Bas) */}

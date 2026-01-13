@@ -140,7 +140,7 @@ export default function DriverLayout() {
             </header>
 
             {/* Zone de Contenu (Padding pour Header et Footer) */}
-            <main className="flex-1 pt-16 pb-20 px-4 overflow-y-auto">
+            <main className="flex-1 pt-24 pb-20 px-4 overflow-y-auto">
                 <Outlet />
             </main>
 

@@ -475,6 +475,11 @@ export const completeDelivery = async (id: number) => {
   return response.data;
 };
 
+export const updateDriverStatus = async (status: string) => {
+  const response = await api.patch('/driver/status', { status });
+  return response.data;
+};
+
 export const getDriverHistory = async () => {
   const response = await api.get('/driver/history');
   return response.data;

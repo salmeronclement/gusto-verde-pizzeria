@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { Bike, History, LogOut, Circle, Moon, Sun } from 'lucide-react';
 // Correction de l'import : on utilise updateDriver au lieu de updateDriverStatus
-import { getDriverProfile, updateDriver } from '../../services/api';
+import { getDriverProfile, updateDriverStatus } from '../../services/api';
 
 export default function DriverLayout() {
     const location = useLocation();
@@ -54,8 +54,8 @@ export default function DriverLayout() {
         if (!driverId) return;
 
         try {
-            // On utilise updateDriver avec l'ID récupéré
-            await updateDriver(driverId, { current_status: newStatus });
+            // On utilise la route driver dédiée
+            await updateDriverStatus(newStatus);
             setStatus(newStatus);
             setIsMenuOpen(false);
         } catch (error) {

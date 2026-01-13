@@ -215,69 +215,91 @@ export const Cart: React.FC = () => {
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: index * 0.1 }}
-                                            className={`flex items-center gap-4 
+                                            className={`flex flex-col sm:flex-row sm:items-center gap-4 relative 
                                             ${item.isFree ? 'bg-green-50 p-4 rounded-xl border-none' : ''}
                                             ${item.isReward ? 'bg-orange-50 p-4 rounded-xl border-orange-100 border' : ''}
                                             `}
                                         >
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="font-sans font-bold text-xl text-dark mb-1 flex items-center gap-2">
-                                                    {item.name}
-                                                    {item.isFree && (
-                                                        <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-full uppercase">Offerte</span>
-                                                    )}
-                                                    {item.isReward && (
-                                                        <span className="bg-orange-500 text-white text-xs px-2 py-1 rounded-full uppercase">Cadeau Fidélité</span>
-                                                    )}
-                                                </h3>
-                                                {!item.isFree && !item.isReward && (
-                                                    <p className="text-sm text-gray-600">
-                                                        {formatPrice(item.unitPrice || 0)} / unité
-                                                    </p>
-                                                )}
-                                                {item.isReward && (
-                                                    <p className="text-sm text-orange-700 font-medium">
-                                                        Récompense fidélité appliquée
-                                                    </p>
-                                                )}
+
+                                            {/* Header Info (Title + Unit Price) */}
+                                            <div className="flex-1 min-w-0 w-full sm:w-auto">
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <h3 className="font-sans font-bold text-lg sm:text-xl text-dark mb-1 flex flex-wrap items-center gap-2">
+                                                            {item.name}
+                                                            {item.isFree && (
+                                                                <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-full uppercase">Offerte</span>
+                                                            )}
+                                                            {item.isReward && (
+                                                                <span className="bg-orange-500 text-white text-xs px-2 py-1 rounded-full uppercase">Cadeau</span>
+                                                            )}
+                                                        </h3>
+                                                        {!item.isFree && !item.isReward && (
+                                                            <p className="text-sm text-gray-600">
+                                                                {formatPrice(item.unitPrice || 0)} / unité
+                                                            </p>
+                                                        )}
+                                                        {item.isReward && (
+                                                            <p className="text-sm text-orange-700 font-medium">
+                                                                Récompense fidélité appliquée
+                                                            </p>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Mobile Trash Button (Absolute top-right relative to card if needed, or just flexed here) */}
+                                                    <button
+                                                        onClick={() => removeItem(item.productId!, item.isFree, item.isReward)}
+                                                        className="sm:hidden text-gray-400 hover:text-red-600 transition-colors p-1"
+                                                        aria-label="Supprimer"
+                                                    >
+                                                        <Trash2 size={20} />
+                                                    </button>
+                                                </div>
                                             </div>
 
-                                            {/* Quantity Controls */}
-                                            <div className="flex items-center gap-3">
-                                                <button
-                                                    onClick={() => updateQuantity(item.productId!, item.quantity - 1, item.isFree, item.isReward)}
-                                                    className="w-10 h-10 rounded-full bg-gray-100 hover:bg-primary hover:text-white transition-colors flex items-center justify-center text-dark"
-                                                >
-                                                    <Minus size={18} />
-                                                </button>
-                                                <span className="font-sans font-bold text-xl w-10 text-center text-dark">
-                                                    {item.quantity}
-                                                </span>
-                                                <button
-                                                    onClick={() => updateQuantity(item.productId!, item.quantity + 1, item.isFree, item.isReward)}
-                                                    disabled={!canIncrease || item.isReward}
-                                                    className={`w-10 h-10 rounded-full flex items-center justify-center text-dark transition-colors ${(canIncrease && !item.isReward)
-                                                        ? 'bg-gray-100 hover:bg-primary hover:text-white'
-                                                        : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
-                                                        }`}
-                                                >
-                                                    <Plus size={18} />
-                                                </button>
-                                            </div>
-                                            <div className="text-right w-28">
-                                                <p className={`font-sans font-bold text-2xl ${(item.isFree || item.isReward) ? 'text-green-600' : 'text-primary'}`}>
-                                                    {(item.isFree || item.isReward) ? 'GRATUIT' : formatPrice(item.subtotal || 0)}
-                                                </p>
-                                            </div>
+                                            {/* Quantity + Subtotal Row */}
+                                            <div className="flex items-center justify-between w-full sm:w-auto gap-6 sm:gap-4">
+                                                {/* Quantity Controls */}
+                                                <div className="flex items-center gap-3 bg-white sm:bg-transparent rounded-lg p-1 sm:p-0 border sm:border-none border-gray-100 shadow-sm sm:shadow-none">
+                                                    <button
+                                                        onClick={() => updateQuantity(item.productId!, item.quantity - 1, item.isFree, item.isReward)}
+                                                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-100 hover:bg-primary hover:text-white transition-colors flex items-center justify-center text-dark"
+                                                    >
+                                                        <Minus size={16} />
+                                                    </button>
+                                                    <span className="font-sans font-bold text-lg sm:text-xl w-8 text-center text-dark">
+                                                        {item.quantity}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => updateQuantity(item.productId!, item.quantity + 1, item.isFree, item.isReward)}
+                                                        disabled={!canIncrease || item.isReward}
+                                                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-dark transition-colors ${(canIncrease && !item.isReward)
+                                                            ? 'bg-gray-100 hover:bg-primary hover:text-white'
+                                                            : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
+                                                            }`}
+                                                    >
+                                                        <Plus size={16} />
+                                                    </button>
+                                                </div>
 
-                                            {/* Remove Button */}
-                                            <button
-                                                onClick={() => removeItem(item.productId!, item.isFree, item.isReward)}
-                                                className="text-red-500 hover:text-red-600 transition-colors p-2"
-                                                aria-label="Supprimer"
-                                            >
-                                                <Trash2 size={22} />
-                                            </button>
+                                                {/* Price + Desktop Trash */}
+                                                <div className="flex items-center gap-4">
+                                                    <div className="text-right sm:w-28">
+                                                        <p className={`font-sans font-bold text-xl sm:text-2xl ${(item.isFree || item.isReward) ? 'text-green-600' : 'text-primary'}`}>
+                                                            {(item.isFree || item.isReward) ? 'GRATUIT' : formatPrice(item.subtotal || 0)}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Desktop Trash Button */}
+                                                    <button
+                                                        onClick={() => removeItem(item.productId!, item.isFree, item.isReward)}
+                                                        className="hidden sm:block text-gray-400 hover:text-red-600 transition-colors p-2"
+                                                        aria-label="Supprimer"
+                                                    >
+                                                        <Trash2 size={22} />
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </motion.div>
 
                                         {/* Notes input for item customization */}

@@ -34,6 +34,7 @@ export const getImageUrl = (path: string | undefined | null) => {
 };
 
 // Intercepteur pour le token JWT
+// Intercepteur pour le token JWT
 api.interceptors.request.use((config) => {
   let token = null;
 
@@ -51,7 +52,22 @@ api.interceptors.request.use((config) => {
       }
     }
   }
-  // 2. Sinon -> Token classique (Client / Livreur)
+  // 2. Si requête DRIVER -> Chercher le token dans driver-storage
+  else if (config.url?.includes('/driver')) {
+    const driverStorage = localStorage.getItem('driver-storage');
+    // Le driver login page stocke : { state: { token: ..., user: ... } }
+    if (driverStorage) {
+      try {
+        const parsed = JSON.parse(driverStorage);
+        if (parsed.state?.token) {
+          token = parsed.state.token;
+        }
+      } catch (e) {
+        console.error("Erreur parsing token driver:", e);
+      }
+    }
+  }
+  // 3. Sinon -> Token classique (Client)
   else {
     token = localStorage.getItem('token');
   }

@@ -67,7 +67,7 @@ export default function DriverLayout() {
     const handleLogout = () => {
         localStorage.removeItem('driver-storage'); // Si tu utilises un store différent
         localStorage.removeItem('token'); // Nettoyage du token auth
-        navigate('/driver/login');
+        navigate('/livreur/login');
     };
 
     const isActive = (path: string) => location.pathname === path;
@@ -141,16 +141,16 @@ export default function DriverLayout() {
             {/* Navigation Fixe (Bas) */}
             <nav className={`fixed bottom-0 left-0 right-0 border-t h-16 flex items-center justify-around z-50 pb-safe transition-colors duration-300 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                 <Link
-                    to="/driver/dashboard"
-                    className={`flex flex-col items-center justify-center w-full h-full ${isActive('/driver/dashboard') || isActive('/driver') ? 'text-red-600' : (darkMode ? 'text-gray-500' : 'text-gray-400')}`}
+                    to="/livreur/dashboard"
+                    className={`flex flex-col items-center justify-center w-full h-full ${isActive('/livreur/dashboard') || isActive('/livreur') ? 'text-red-600' : (darkMode ? 'text-gray-500' : 'text-gray-400')}`}
                 >
                     <Bike size={24} />
                     <span className="text-xs font-medium mt-1">Courses</span>
                 </Link>
 
                 <Link
-                    to="/driver/history"
-                    className={`flex flex-col items-center justify-center w-full h-full ${isActive('/driver/history') ? 'text-red-600' : (darkMode ? 'text-gray-500' : 'text-gray-400')}`}
+                    to="/livreur/historique"
+                    className={`flex flex-col items-center justify-center w-full h-full ${isActive('/livreur/historique') ? 'text-red-600' : (darkMode ? 'text-gray-500' : 'text-gray-400')}`}
                 >
                     <History size={24} />
                     <span className="text-xs font-medium mt-1">Historique</span>

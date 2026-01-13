@@ -36,7 +36,7 @@ export default function DriverLoginPage() {
                 localStorage.setItem('driver-storage', JSON.stringify({
                     state: { token: data.token, user: data.driver }
                 }));
-                window.location.href = '/driver';
+                window.location.href = '/livreur/dashboard';
             }
         } catch (err: any) {
             console.error(err);

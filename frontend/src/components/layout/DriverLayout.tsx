@@ -86,6 +86,9 @@ export default function DriverLayout() {
             <header className={`fixed top-0 left-0 right-0 shadow-sm z-50 h-16 flex items-center justify-between px-4 transition-colors duration-300 ${darkMode ? 'bg-gray-800 border-b border-gray-700' : 'bg-white'}`}>
                 <div className="flex items-center gap-2">
                     <span className="text-red-600 font-black text-xl tracking-tight">DOLCE</span>
+                    <span className="bg-forest/10 text-forest px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider border border-forest/20">
+                        Espace Livreur
+                    </span>
                 </div>
 
                 <div className="flex items-center gap-3">

@@ -125,7 +125,7 @@ const DriverDashboardPage: React.FC = () => {
                             <div
                                 key={order.id}
                                 className={`rounded-2xl shadow-sm overflow-hidden border transition-colors ${isStarted
-                                    ? 'bg-orange-50 border-orange-100 dark:bg-orange-900/20 dark:border-orange-800'
+                                    ? 'bg-green-50 border-green-100 dark:bg-green-900/20 dark:border-green-800'
                                     : 'bg-white border-gray-100 dark:bg-gray-800 dark:border-gray-700'
                                     }`}
                             >
@@ -145,7 +145,7 @@ const DriverDashboardPage: React.FC = () => {
 
                                     {/* Badge Statut */}
                                     <div className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 ${isStarted
-                                        ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary'
+                                        ? 'bg-forest/10 text-forest dark:bg-green-500/20 dark:text-green-300'
                                         : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
                                         }`}>
                                         {isStarted ? (
@@ -162,7 +162,7 @@ const DriverDashboardPage: React.FC = () => {
                                     {/* Client & Adresse */}
                                     <div className="flex gap-3">
                                         <div className="mt-1">
-                                            <MapPin className="text-red-500" size={20} />
+                                            <MapPin className={isStarted ? "text-forest" : "text-gray-400"} size={20} />
                                         </div>
                                         <div>
                                             <h3 className="font-bold text-gray-900 dark:text-white">{order.customer.name}</h3>
@@ -175,7 +175,7 @@ const DriverDashboardPage: React.FC = () => {
                                                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.customer.address)}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="mt-3 inline-flex items-center gap-2 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary px-4 py-2 rounded-lg font-bold hover:bg-primary/20 dark:hover:bg-primary/30 transition-colors w-full justify-center sm:w-auto"
+                                                className="mt-3 inline-flex items-center gap-2 bg-forest/10 dark:bg-green-500/20 text-forest dark:text-green-300 px-4 py-2 rounded-lg font-bold hover:bg-forest/20 dark:hover:bg-green-500/30 transition-colors w-full justify-center sm:w-auto"
                                             >
                                                 <Navigation size={18} /> 📍 OUVRIR LE GPS
                                             </a>
@@ -245,7 +245,7 @@ const DriverDashboardPage: React.FC = () => {
                                             <button
                                                 onClick={() => handleStartClick(order)}
                                                 disabled={processingId === order.id}
-                                                className="w-full py-4 bg-primary hover:bg-yellow-600 text-white rounded-xl font-black text-lg shadow-lg shadow-orange-200 dark:shadow-none flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                                                className="w-full py-4 bg-forest hover:bg-green-900 text-white rounded-xl font-black text-lg shadow-lg shadow-green-200 dark:shadow-none flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
                                             >
                                                 🚀 JE PARS
                                             </button>
@@ -253,7 +253,7 @@ const DriverDashboardPage: React.FC = () => {
                                             <button
                                                 onClick={() => handleCompleteDelivery(order.id)}
                                                 disabled={processingId === order.id}
-                                                className="w-full py-4 bg-forest hover:bg-green-900 text-white rounded-xl font-black text-lg shadow-lg shadow-green-200 dark:shadow-none flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                                                className="w-full py-4 bg-primary hover:bg-yellow-600 text-white rounded-xl font-black text-lg shadow-lg shadow-orange-200 dark:shadow-none flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
                                             >
                                                 <CheckCircle size={24} /> TERMINÉ
                                             </button>
@@ -273,7 +273,7 @@ const DriverDashboardPage: React.FC = () => {
                     <div className="bg-white dark:bg-gray-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom duration-300">
 
                         {/* Header Modale */}
-                        <div className="bg-primary p-4 flex justify-between items-center text-white">
+                        <div className="bg-forest p-4 flex justify-between items-center text-white">
                             <h2 className="font-black text-lg flex items-center gap-2">
                                 <AlertTriangle size={20} /> VÉRIFICATION
                             </h2>
@@ -294,7 +294,7 @@ const DriverDashboardPage: React.FC = () => {
                                         .filter(item => item.product_name !== "Frais de livraison")
                                         .map((item, idx) => (
                                             <li key={idx} className="flex items-center gap-3 text-lg">
-                                                <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                                                <div className="w-2 h-2 rounded-full bg-forest flex-shrink-0" />
                                                 <span className="text-gray-800 dark:text-gray-200">
                                                     <span className="font-bold">{item.quantity}x</span> {item.product_name}
                                                 </span>
@@ -310,7 +310,7 @@ const DriverDashboardPage: React.FC = () => {
 
                             <button
                                 onClick={confirmStartDelivery}
-                                className="w-full py-4 bg-primary hover:bg-yellow-600 text-white rounded-xl font-black text-xl shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                                className="w-full py-4 bg-forest hover:bg-green-900 text-white rounded-xl font-black text-xl shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
                             >
                                 C'EST TOUT BON, JE FONCE ! <ArrowRight size={24} />
                             </button>

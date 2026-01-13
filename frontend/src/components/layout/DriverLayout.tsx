@@ -81,12 +81,15 @@ export default function DriverLayout() {
     };
 
     return (
-        <div className={`min-h-screen flex flex-col transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-            {/* Header Fixe */}
-            <header className={`fixed top-0 left-0 right-0 shadow-sm z-50 h-16 flex items-center justify-between px-4 transition-colors duration-300 ${darkMode ? 'bg-gray-800 border-b border-gray-700' : 'bg-white'}`}>
+        <div className={`min-h-screen flex flex-col transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-cream text-gray-900'}`}>
+            {/* Header Fixe - Vert Forêt (Style Admin) */}
+            <header className={`fixed top-0 left-0 right-0 shadow-md z-50 h-16 flex items-center justify-between px-4 transition-colors duration-300 ${darkMode ? 'bg-gray-800 border-b border-gray-700' : 'bg-forest text-white'}`}>
                 <div className="flex items-center gap-2">
-                    <span className="text-red-600 font-black text-xl tracking-tight">DOLCE</span>
-                    <span className="bg-forest/10 text-forest px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider border border-forest/20">
+                    {/* Logo Gusto Verde */}
+                    <span className="text-lg sm:text-xl font-display font-bold text-white">
+                        Gusto <span className="text-primary">Verde</span>
+                    </span>
+                    <span className="bg-white/10 text-cream/90 px-2 py-0.5 rounded text-[10px] sm:text-xs font-sans font-medium uppercase tracking-wider border border-white/10 ml-1">
                         Espace Livreur
                     </span>
                 </div>
@@ -95,7 +98,7 @@ export default function DriverLayout() {
                     {/* Dark Mode Toggle */}
                     <button
                         onClick={() => setDarkMode(!darkMode)}
-                        className={`p-2 rounded-full transition-colors ${darkMode ? 'bg-gray-700 text-yellow-400' : 'bg-gray-100 text-gray-600'}`}
+                        className={`p-2 rounded-full transition-colors ${darkMode ? 'bg-gray-700 text-yellow-400' : 'bg-white/10 text-cream hover:bg-white/20'}`}
                     >
                         {darkMode ? <Sun size={18} /> : <Moon size={18} />}
                     </button>
@@ -104,7 +107,7 @@ export default function DriverLayout() {
                     <div className="relative">
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-colors ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-100 border-gray-200 text-gray-700'}`}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-colors ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-white/10 border-white/20 text-white hover:bg-white/20'}`}
                         >
                             <Circle size={12} fill="currentColor" className={getStatusColor(status)} />
                             <span className="text-sm font-bold capitalize">
@@ -129,7 +132,7 @@ export default function DriverLayout() {
 
                     <button
                         onClick={handleLogout}
-                        className={`p-2 rounded-full transition-colors ${darkMode ? 'text-gray-400 hover:bg-red-900/30 hover:text-red-400' : 'text-gray-500 hover:bg-red-50 hover:text-red-600'}`}
+                        className={`p-2 rounded-full transition-colors ${darkMode ? 'text-gray-400 hover:bg-red-900/30 hover:text-red-400' : 'text-red-300 hover:bg-red-500/20 hover:text-white'}`}
                     >
                         <LogOut size={20} />
                     </button>
@@ -141,11 +144,11 @@ export default function DriverLayout() {
                 <Outlet />
             </main>
 
-            {/* Navigation Fixe (Bas) */}
-            <nav className={`fixed bottom-0 left-0 right-0 border-t h-16 flex items-center justify-around z-50 pb-safe transition-colors duration-300 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            {/* Navigation Fixe (Bas) - Vert Forêt (Style Admin) */}
+            <nav className={`fixed bottom-0 left-0 right-0 border-t h-16 flex items-center justify-around z-50 pb-safe transition-colors duration-300 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-forest border-forest-dark text-cream/70'}`}>
                 <Link
                     to="/livreur/dashboard"
-                    className={`flex flex-col items-center justify-center w-full h-full ${isActive('/livreur/dashboard') || isActive('/livreur') ? 'text-red-600' : (darkMode ? 'text-gray-500' : 'text-gray-400')}`}
+                    className={`flex flex-col items-center justify-center w-full h-full transition-colors ${isActive('/livreur/dashboard') || isActive('/livreur') ? 'text-primary' : 'hover:text-white'}`}
                 >
                     <Bike size={24} />
                     <span className="text-xs font-medium mt-1">Courses</span>
@@ -153,7 +156,7 @@ export default function DriverLayout() {
 
                 <Link
                     to="/livreur/historique"
-                    className={`flex flex-col items-center justify-center w-full h-full ${isActive('/livreur/historique') ? 'text-red-600' : (darkMode ? 'text-gray-500' : 'text-gray-400')}`}
+                    className={`flex flex-col items-center justify-center w-full h-full transition-colors ${isActive('/livreur/historique') ? 'text-primary' : 'hover:text-white'}`}
                 >
                     <History size={24} />
                     <span className="text-xs font-medium mt-1">Historique</span>

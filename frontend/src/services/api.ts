@@ -440,15 +440,26 @@ export const verifyDriverCode = async (phone: string, code: string) => {
 };
 
 export const getDriverProfile = async () => {
-  const response = await api.get('/driver/profile');
+  const response = await api.get('/driver/me');
   return response.data;
 };
 
 export const getDriverOrders = async () => {
-  const response = await api.get('/driver/orders');
+  const response = await api.get('/driver/my-orders');
   return response.data;
 };
 
-export const startDelivery = async (id: number) => updateOrderStatus(id, 'en_livraison');
-export const completeDelivery = async (id: number) => updateOrderStatus(id, 'livree');
-export const getDriverHistory = async () => []; // TODO: Implement if needed
+export const startDelivery = async (id: number) => {
+  const response = await api.patch(`/driver/${id}/start`);
+  return response.data;
+};
+
+export const completeDelivery = async (id: number) => {
+  const response = await api.patch(`/driver/${id}/complete`);
+  return response.data;
+};
+
+export const getDriverHistory = async () => {
+  const response = await api.get('/driver/history');
+  return response.data;
+};

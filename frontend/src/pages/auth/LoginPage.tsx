@@ -249,7 +249,7 @@ export default function LoginPage() {
                                         required
                                     />
                                     <p className="mt-2 text-xs text-gray-500 text-center">
-                                        Regardez dans le terminal du serveur pour le code 📱
+                                        Entrez le code reçu par SMS 📱
                                     </p>
                                 </div>
 

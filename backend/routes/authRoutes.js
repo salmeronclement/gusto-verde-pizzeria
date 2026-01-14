@@ -4,9 +4,105 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 const authMiddleware = require('../middleware/authMiddleware');
+const smsService = require('../services/smsService');
 
 const promiseDb = db.promise();
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_change_me';
+
+// =================================================================
+// FIREBASE AUTH (Phone Auth géré par Firebase côté Frontend)
+// =================================================================
+
+// POST /api/auth/login-firebase
+// Body: { phone: "+33..." } - Numéro validé par Firebase
+router.post('/login-firebase', async (req, res) => {
+    const { phone } = req.body;
+
+    if (!phone) {
+        return res.status(400).json({ error: 'Numéro de téléphone requis.' });
+    }
+
+    try {
+        // Chercher si le client existe
+        const [existing] = await promiseDb.query(
+            'SELECT * FROM customers WHERE phone = ?',
+            [phone]
+        );
+
+        let customer;
+        let needsProfile = false;
+
+        if (existing.length > 0) {
+            // Client existant
+            customer = existing[0];
+            needsProfile = !customer.first_name && !customer.last_name;
+        } else {
+            // Nouveau client - Créer un profil minimal
+            const [result] = await promiseDb.query(
+                'INSERT INTO customers (phone, loyalty_points, created_at) VALUES (?, 0, NOW())',
+                [phone]
+            );
+            customer = {
+                id: result.insertId,
+                phone: phone,
+                first_name: null,
+                last_name: null,
+                loyalty_points: 0
+            };
+            needsProfile = true;
+            console.log(`✅ Nouveau client Firebase créé: #${result.insertId} (${phone})`);
+        }
+
+        // Récupérer les adresses
+        const [addresses] = await promiseDb.query(
+            'SELECT * FROM addresses WHERE customer_id = ?',
+            [customer.id]
+        );
+
+        // Générer le JWT
+        const userName = `${customer.first_name || ''} ${customer.last_name || ''}`.trim() || 'Client';
+        const token = jwt.sign(
+            {
+                id: customer.id,
+                phone: customer.phone,
+                name: userName,
+                role: 'client'
+            },
+            JWT_SECRET,
+            { expiresIn: '30d' }
+        );
+
+        console.log(`✅ Client Firebase connecté: #${customer.id} (${phone})`);
+
+        res.json({
+            message: 'Connexion réussie',
+            token,
+            user: {
+                id: customer.id,
+                first_name: customer.first_name,
+                last_name: customer.last_name,
+                name: userName,
+                email: customer.email,
+                phone: customer.phone,
+                role: 'client',
+                loyalty_points: customer.loyalty_points || 0,
+                addresses: addresses.map(addr => ({
+                    id: addr.id,
+                    name: addr.label || 'Mon adresse',
+                    street: addr.street,
+                    postalCode: addr.postal_code,
+                    city: addr.city,
+                    additionalInfo: addr.additional_info
+                }))
+            },
+            needsProfile
+        });
+
+    } catch (error) {
+        console.error('Firebase Login Error:', error);
+        res.status(500).json({ error: 'Erreur serveur lors de la connexion Firebase' });
+    }
+});
 
 // =================================================================
 // 1. AUTH CLIENT (CLIENTS)
@@ -262,38 +358,23 @@ router.post('/client/send-code', async (req, res) => {
         let customerId;
 
         if (isNewUser) {
-            // Créer un nouveau client avec juste le téléphone
+            // Créer un nouveau client avec juste le téléphone pour avoir une trace
+            // Mais on n'a plus besoin de stocker OTP_CODE en base
             const [result] = await promiseDb.query(
                 'INSERT INTO customers (phone, loyalty_points, created_at) VALUES (?, 0, NOW())',
                 [phone]
             );
-            customerId = result.insertId;
-            console.log(`✅ Nouveau client créé: #${customerId} (${phone})`);
-        } else {
-            customerId = existing[0].id;
+            console.log(`✅ Nouveau client créé: #${result.insertId} (${phone})`);
         }
 
-        // Générer un code à 6 chiffres
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // +10 minutes
-
-        // Sauvegarder le code en BDD
-        await promiseDb.query(
-            'UPDATE customers SET otp_code = ?, otp_expires_at = ? WHERE id = ?',
-            [code, expiresAt, customerId]
-        );
-
-        // ⚠️ SIMULATION SMS - Afficher en console
-        console.log('');
-        console.log('═══════════════════════════════════════════════════');
-        console.log(`📱 SMS SIMULÉ POUR ${phone} : ${code}`);
-        console.log('═══════════════════════════════════════════════════');
-        console.log('');
+        // ENVOI SMS (Via Twilio Verify)
+        // Twilio gère le code et son stockage interne
+        await smsService.startVerification(phone);
 
         res.json({
             success: true,
             isNewUser,
-            message: 'Code envoyé avec succès'
+            message: 'Code envoyé via Twilio Verify 🚀'
         });
 
     } catch (error) {
@@ -325,14 +406,11 @@ router.post('/client/verify-code', async (req, res) => {
 
         const customer = customers[0];
 
-        // Vérifier le code
-        if (customer.otp_code !== code) {
-            return res.status(401).json({ error: 'Code invalide.' });
-        }
+        // Vérifier le code via Twilio Verify
+        const isValid = await smsService.checkVerification(phone, code);
 
-        // Vérifier l'expiration
-        if (new Date() > new Date(customer.otp_expires_at)) {
-            return res.status(401).json({ error: 'Code expiré. Demandez un nouveau code.' });
+        if (!isValid) {
+            return res.status(401).json({ error: 'Code invalide ou expiré.' });
         }
 
         // Mettre à jour le profil si c'est un nouveau client
@@ -346,7 +424,7 @@ router.post('/client/verify-code', async (req, res) => {
             customer.last_name = lastName.trim();
         }
 
-        // Nettoyer le code OTP
+        // Clean-up optionnel (plus strictement nécessaire vu que Verify gère ça, mais propre)
         await promiseDb.query(
             'UPDATE customers SET otp_code = NULL, otp_expires_at = NULL WHERE id = ?',
             [customer.id]
@@ -479,15 +557,8 @@ router.post('/driver/send-code', async (req, res) => {
         }
 
         // Generate 4 digit code
-        const code = Math.floor(1000 + Math.random() * 9000).toString();
-        // Expires in 15 minutes
-        const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
-
-        // Update DB
-        await promiseDb.query('UPDATE drivers SET otp_code = ?, otp_expires_at = ? WHERE id = ?', [code, expiresAt, driver.id]);
-
-        // SIMULATION SMS (Pour le dev)
-        console.log(`📨 SMS SIMULÉ pour ${phone} : ${code}`);
+        // ENVOI SMS (Via Twilio Verify)
+        await smsService.startVerification(phone);
 
         res.json({ success: true, message: 'Code envoyé' });
 
@@ -514,17 +585,14 @@ router.post('/driver/verify-code', async (req, res) => {
 
         const driver = drivers[0];
 
-        // Check code
-        if (driver.otp_code !== code) {
-            return res.status(401).json({ error: 'Code invalide.' });
+        // Vérifier Code via Twilio Verify
+        const isValid = await smsService.checkVerification(phone, code);
+
+        if (!isValid) {
+            return res.status(401).json({ error: 'Code invalide ou expiré.' });
         }
 
-        // Check expiry
-        if (new Date() > new Date(driver.otp_expires_at)) {
-            return res.status(401).json({ error: 'Code expiré. Demandez-en un nouveau.' });
-        }
-
-        // NETTOYAGE (Crucial) : On efface le code pour qu'il ne serve qu'une fois
+        // Clean-up
         await promiseDb.query('UPDATE drivers SET otp_code = NULL, otp_expires_at = NULL WHERE id = ?', [driver.id]);
 
         // Generate Long-Lived Token (365 days)

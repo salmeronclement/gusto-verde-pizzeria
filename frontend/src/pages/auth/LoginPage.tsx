@@ -1,11 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
-import { sendClientAuthCode, verifyClientAuthCode } from '../../services/api';
+import { auth } from '../../config/firebase';
+import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
 import { Phone, ArrowLeft, ArrowRight, Loader2, User, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { api } from '../../services/api';
 
 type Step = 'phone' | 'code' | 'profile';
+
+declare global {
+    interface Window {
+        recaptchaVerifier: RecaptchaVerifier;
+    }
+}
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -19,7 +27,24 @@ export default function LoginPage() {
     const [isNewUser, setIsNewUser] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
 
+    const recaptchaContainerRef = useRef<HTMLDivElement>(null);
+
+    // Initialiser reCAPTCHA
+    useEffect(() => {
+        if (!window.recaptchaVerifier && recaptchaContainerRef.current) {
+            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                size: 'invisible',
+                callback: () => {
+                    console.log('reCAPTCHA résolu');
+                },
+                'expired-callback': () => {
+                    console.log('reCAPTCHA expiré');
+                }
+            });
+        }
+    }, []);
 
     // Formater le numéro pour l'affichage
     const formatPhone = (value: string) => {
@@ -31,65 +56,89 @@ export default function LoginPage() {
         return cleaned;
     };
 
+    // Convertir en format international
+    const toInternational = (localPhone: string) => {
+        const cleaned = localPhone.replace(/\s/g, '');
+        if (cleaned.startsWith('0')) {
+            return '+33' + cleaned.substring(1);
+        }
+        return cleaned;
+    };
+
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPhone(formatPhone(e.target.value));
     };
 
-    // ... inside component
+    // Étape 1: Envoyer le code via Firebase
     const handleSendCode = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
-        const cleanPhone = phone.replace(/\s/g, '');
+        const internationalPhone = toInternational(phone);
 
         try {
-            const data = await sendClientAuthCode(cleanPhone);
-            setIsNewUser(data.isNewUser);
+            const appVerifier = window.recaptchaVerifier;
+            const result = await signInWithPhoneNumber(auth, internationalPhone, appVerifier);
+            setConfirmationResult(result);
             setStep('code');
         } catch (err: any) {
-            setError(err.response?.data?.error || err.message || 'Erreur lors de l\'envoi du code');
+            console.error('Firebase SMS Error:', err);
+            setError(err.message || 'Erreur lors de l\'envoi du code');
+            // Reset reCAPTCHA on error
+            if (window.recaptchaVerifier) {
+                window.recaptchaVerifier.clear();
+                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                    size: 'invisible'
+                });
+            }
         } finally {
             setLoading(false);
         }
     };
 
-    // Étape 2: Vérifier le code
+    // Étape 2: Vérifier le code et connecter via notre Backend
     const handleVerifyCode = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
-        const cleanPhone = phone.replace(/\s/g, '');
-
         try {
-            const data = await verifyClientAuthCode({
-                phone: cleanPhone,
-                code
-            });
-
-            // 1. On connecte l'utilisateur tout de suite (Token valide)
-            login(data.token, data.user);
-
-            // 2. Si le profil est incomplet -> Étape suivante
-            if (data.needsProfile) {
-                setStep('profile');
-                setLoading(false);
-                return;
+            if (!confirmationResult) {
+                throw new Error('Session expirée. Veuillez renvoyer le code.');
             }
 
-            // Sinon -> Redirection Accueil
-            navigate('/');
+            // 1. Valider le code avec Firebase
+            const userCredential = await confirmationResult.confirm(code);
+            const firebasePhone = userCredential.user.phoneNumber;
+
+            if (!firebasePhone) {
+                throw new Error('Numéro non récupéré de Firebase.');
+            }
+
+            // 2. Appeler notre Backend pour récupérer/créer le profil MySQL
+            const response = await api.post('/auth/login-firebase', { phone: firebasePhone });
+            const { token, user, needsProfile } = response.data;
+
+            // 3. Stocker dans le store
+            login(token, user);
+            setIsNewUser(needsProfile);
+
+            // 4. Rediriger ou compléter le profil
+            if (needsProfile) {
+                setStep('profile');
+            } else {
+                navigate('/');
+            }
         } catch (err: any) {
-            setError(err.response?.data?.error || err.message || 'Erreur lors de la vérification');
-            // Si erreur, on déconnecte par sécurité
-            useAuthStore.getState().logout();
+            console.error('Verification Error:', err);
+            setError(err.response?.data?.error || err.message || 'Code invalide');
         } finally {
             setLoading(false);
         }
     };
 
-    // Étape 3: Compléter le profil (Authentifié via Token)
+    // Étape 3: Compléter le profil
     const handleCompleteProfile = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -102,16 +151,11 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            // On utilise le token stocké pour mettre à jour le profil
-            // import { updateUserProfile } from '../../services/api';
-            // Il faut s'assurer que updateUserProfile est importé ou disponible via le store
             const userStore = useAuthStore.getState();
-
             await userStore.updateProfile({
                 first_name: firstName.trim(),
                 last_name: lastName.trim()
             });
-
             navigate('/');
         } catch (err: any) {
             console.error(err);
@@ -123,6 +167,9 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+            {/* Conteneur invisible pour reCAPTCHA */}
+            <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
+
             <div className="max-w-md w-full">
                 {/* Header */}
                 <div className="text-center mb-8">

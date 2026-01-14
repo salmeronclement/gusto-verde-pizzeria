@@ -2,7 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyB7egLFCUxzu1QMjJBVdleT-YbO-G1L9w4",
+    apiKey: "AIzaSyB7egLfCUxzu1QMjJBVdleT-YbO-G1L9w4",
     authDomain: "gusto-verde-auth.firebaseapp.com",
     projectId: "gusto-verde-auth",
     storageBucket: "gusto-verde-auth.firebasestorage.app",

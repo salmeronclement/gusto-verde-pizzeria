@@ -23,19 +23,15 @@ export default function HeroSlider() {
   /**
    * ⚠️ IMPORTANT
    * Cette variable DOIT exister :
-   * .env.production → VITE_API_URL=http://51.68.229.173:5005
+   * .env.production → VITE_API_URL=http://51.68.229.173:5005/api
    */
-  const API_BASE = import.meta.env.VITE_API_URL
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://51.68.229.173:5005/api'
 
   useEffect(() => {
     const fetchSlides = async () => {
       try {
-        if (!API_BASE) {
-          throw new Error('❌ VITE_API_URL is not defined')
-        }
-
         const response = await fetch(
-          `${API_BASE}/api/content/hero-slides`
+          `${API_BASE}/content/hero-slides`
         )
 
         if (!response.ok) {

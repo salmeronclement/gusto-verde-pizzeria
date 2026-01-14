@@ -16,17 +16,31 @@ const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_change_me';
 // POST /api/auth/login-firebase
 // Body: { phone: "+33..." } - Numéro validé par Firebase
 router.post('/login-firebase', async (req, res) => {
-    const { phone } = req.body;
+    let { phone } = req.body;
 
     if (!phone) {
         return res.status(400).json({ error: 'Numéro de téléphone requis.' });
     }
 
+    // Normaliser le numéro : convertir en format local (0...) pour la recherche
+    const normalizePhone = (p) => {
+        p = p.replace(/[\s\-\.]/g, '');
+        if (p.startsWith('+33')) {
+            return '0' + p.substring(3);
+        }
+        return p;
+    };
+
+    // Format local pour la recherche et le stockage
+    const localPhone = normalizePhone(phone);
+    // Format international pour fallback
+    const intlPhone = localPhone.startsWith('0') ? '+33' + localPhone.substring(1) : phone;
+
     try {
-        // Chercher si le client existe
+        // Chercher si le client existe (avec les deux formats)
         const [existing] = await promiseDb.query(
-            'SELECT * FROM customers WHERE phone = ?',
-            [phone]
+            'SELECT * FROM customers WHERE phone = ? OR phone = ? LIMIT 1',
+            [localPhone, intlPhone]
         );
 
         let customer;
@@ -36,21 +50,28 @@ router.post('/login-firebase', async (req, res) => {
             // Client existant
             customer = existing[0];
             needsProfile = !customer.first_name && !customer.last_name;
+
+            // Mettre à jour le numéro au format local si différent
+            if (customer.phone !== localPhone) {
+                await promiseDb.query('UPDATE customers SET phone = ? WHERE id = ?', [localPhone, customer.id]);
+                customer.phone = localPhone;
+                console.log(`📞 Numéro normalisé pour client #${customer.id}: ${localPhone}`);
+            }
         } else {
-            // Nouveau client - Créer un profil minimal
+            // Nouveau client - Créer un profil minimal avec numéro local
             const [result] = await promiseDb.query(
                 'INSERT INTO customers (phone, loyalty_points, created_at) VALUES (?, 0, NOW())',
-                [phone]
+                [localPhone]
             );
             customer = {
                 id: result.insertId,
-                phone: phone,
+                phone: localPhone,
                 first_name: null,
                 last_name: null,
                 loyalty_points: 0
             };
             needsProfile = true;
-            console.log(`✅ Nouveau client Firebase créé: #${result.insertId} (${phone})`);
+            console.log(`✅ Nouveau client Firebase créé: #${result.insertId} (${localPhone})`);
         }
 
         // Récupérer les adresses

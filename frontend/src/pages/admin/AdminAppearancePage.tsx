@@ -24,7 +24,7 @@ export default function AdminAppearancePage() {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://51.68.229.173/api';
+    const API_BASE = import.meta.env.VITE_API_URL || 'http://51.68.229.173:5005/api';
 
     const getAuthToken = () => {
         const stored = localStorage.getItem('admin-storage');

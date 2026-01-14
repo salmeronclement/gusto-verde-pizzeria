@@ -27,7 +27,35 @@ export default function DriverLayout() {
         }
     }, [darkMode]);
 
-    // Chargement du profil et du statut initial
+    // PWA Manifest Injection
+    useEffect(() => {
+        // Set manifest
+        let manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement;
+        if (!manifestLink) {
+            manifestLink = document.createElement('link');
+            manifestLink.rel = 'manifest';
+            document.head.appendChild(manifestLink);
+        }
+        manifestLink.href = '/manifest-driver.json';
+
+        // Set theme color
+        let themeColor = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement;
+        if (!themeColor) {
+            themeColor = document.createElement('meta');
+            themeColor.name = 'theme-color';
+            document.head.appendChild(themeColor);
+        }
+        themeColor.content = '#1E3A2F';
+
+        // Set apple-touch-icon
+        let appleIcon = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement;
+        if (!appleIcon) {
+            appleIcon = document.createElement('link');
+            appleIcon.rel = 'apple-touch-icon';
+            document.head.appendChild(appleIcon);
+        }
+        appleIcon.href = '/driver-icon-192.png';
+    }, []);
     useEffect(() => {
         const loadStatus = async () => {
             try {

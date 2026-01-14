@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link, useLocation, Navigate, Outlet } from 'react-router-dom';
 import { LayoutDashboard, ShoppingBag, UtensilsCrossed, FileText, Users, Settings, LogOut, Pizza, Palette } from 'lucide-react';
 import { useAdminStore } from '../../store/useAdminStore';
@@ -9,6 +10,36 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
     const location = useLocation();
     const { isAuthenticated, logout } = useAdminStore();
+
+    // PWA Manifest Injection
+    useEffect(() => {
+        // Set manifest
+        let manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement;
+        if (!manifestLink) {
+            manifestLink = document.createElement('link');
+            manifestLink.rel = 'manifest';
+            document.head.appendChild(manifestLink);
+        }
+        manifestLink.href = '/manifest-admin.json';
+
+        // Set theme color
+        let themeColor = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement;
+        if (!themeColor) {
+            themeColor = document.createElement('meta');
+            themeColor.name = 'theme-color';
+            document.head.appendChild(themeColor);
+        }
+        themeColor.content = '#2D5A3D';
+
+        // Set apple-touch-icon
+        let appleIcon = document.querySelector('link[rel="apple-touch-icon"]') as HTMLLinkElement;
+        if (!appleIcon) {
+            appleIcon = document.createElement('link');
+            appleIcon.rel = 'apple-touch-icon';
+            document.head.appendChild(appleIcon);
+        }
+        appleIcon.href = '/admin-icon-192.png';
+    }, []);
 
     // --- SÉCURITÉ ADMIN ---
     if (!isAuthenticated) {

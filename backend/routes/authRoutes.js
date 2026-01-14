@@ -125,6 +125,84 @@ router.post('/login-firebase', async (req, res) => {
     }
 });
 
+// POST /api/auth/login-firebase-driver
+// Body: { phone: "+33..." } - Numéro validé par Firebase (pour livreurs)
+router.post('/login-firebase-driver', async (req, res) => {
+    let { phone } = req.body;
+
+    if (!phone) {
+        return res.status(400).json({ error: 'Numéro de téléphone requis.' });
+    }
+
+    // Normaliser le numéro
+    const normalizePhone = (p) => {
+        p = p.replace(/[\s\-\.]/g, '');
+        if (p.startsWith('+33')) {
+            return '0' + p.substring(3);
+        }
+        return p;
+    };
+
+    const localPhone = normalizePhone(phone);
+    const intlPhone = localPhone.startsWith('0') ? '+33' + localPhone.substring(1) : phone;
+
+    try {
+        // Chercher si le livreur existe
+        const [drivers] = await promiseDb.query(
+            'SELECT * FROM drivers WHERE phone = ? OR phone = ? LIMIT 1',
+            [localPhone, intlPhone]
+        );
+
+        if (drivers.length === 0) {
+            return res.status(404).json({ error: 'Aucun livreur trouvé avec ce numéro. Contactez l\'admin.' });
+        }
+
+        const driver = drivers[0];
+
+        // Vérifier si le livreur est actif
+        if (!driver.is_active) {
+            return res.status(403).json({ error: 'Compte livreur inactif. Contactez l\'admin.' });
+        }
+
+        // Normaliser le numéro si nécessaire
+        if (driver.phone !== localPhone) {
+            await promiseDb.query('UPDATE drivers SET phone = ? WHERE id = ?', [localPhone, driver.id]);
+            driver.phone = localPhone;
+        }
+
+        // Générer le JWT
+        const driverName = driver.name || `${driver.first_name || ''} ${driver.last_name || ''}`.trim() || 'Livreur';
+        const token = jwt.sign(
+            {
+                id: driver.id,
+                phone: driver.phone,
+                name: driverName,
+                role: 'driver'
+            },
+            JWT_SECRET,
+            { expiresIn: '365d' }
+        );
+
+        console.log(`✅ Livreur Firebase connecté: #${driver.id} (${localPhone})`);
+
+        res.json({
+            message: 'Connexion réussie',
+            token,
+            driver: {
+                id: driver.id,
+                name: driverName,
+                phone: driver.phone,
+                current_status: driver.current_status || 'inactive',
+                is_active: driver.is_active
+            }
+        });
+
+    } catch (error) {
+        console.error('Firebase Driver Login Error:', error);
+        res.status(500).json({ error: 'Erreur serveur lors de la connexion livreur' });
+    }
+});
+
 // =================================================================
 // 1. AUTH CLIENT (CLIENTS)
 // =================================================================

@@ -180,11 +180,14 @@ router.delete('/:id', async (req, res) => {
             return res.status(404).json({ error: 'Client non trouvé' });
         }
 
+        // Supprimer les items des commandes du client d'abord
+        await promiseDb.query('DELETE FROM order_items WHERE order_id IN (SELECT id FROM orders WHERE customer_id = ?)', [customerId]);
+
+        // Supprimer les commandes du client
+        await promiseDb.query('DELETE FROM orders WHERE customer_id = ?', [customerId]);
+
         // Supprimer les adresses du client
         await promiseDb.query('DELETE FROM addresses WHERE customer_id = ?', [customerId]);
-
-        // Mettre les commandes à customer_id = NULL (on garde l'historique)
-        await promiseDb.query('UPDATE orders SET customer_id = NULL WHERE customer_id = ?', [customerId]);
 
         // Supprimer le client
         await promiseDb.query('DELETE FROM customers WHERE id = ?', [customerId]);

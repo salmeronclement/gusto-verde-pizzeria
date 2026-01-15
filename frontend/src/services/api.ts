@@ -443,6 +443,16 @@ export const getAdminCustomerDetails = async (id: number) => {
   return response.data;
 };
 
+export const updateCustomer = async (id: number, data: { first_name?: string; last_name?: string; email?: string; phone?: string; loyalty_points?: number }) => {
+  const response = await api.put(`/admin/customers/${id}`, data);
+  return response.data;
+};
+
+export const deleteCustomer = async (id: number) => {
+  const response = await api.delete(`/admin/customers/${id}`);
+  return response.data;
+};
+
 // --- LIVREUR ---
 
 export const sendDriverCode = async (phone: string) => {

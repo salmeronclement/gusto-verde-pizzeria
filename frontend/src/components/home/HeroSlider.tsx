@@ -99,7 +99,40 @@ export default function HeroSlider() {
      CAROUSEL
      ========================= */
   return (
-    <section className="relative group">
+    <section className="relative group hero-slider">
+      {/* Custom Swiper Navigation Styling */}
+      <style>{`
+        .hero-slider .swiper-button-prev,
+        .hero-slider .swiper-button-next {
+          width: 56px;
+          height: 56px;
+          background: rgba(45, 90, 61, 0.9);
+          border-radius: 50%;
+          color: white;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .hero-slider .swiper-button-prev:hover,
+        .hero-slider .swiper-button-next:hover {
+          background: #B8860B;
+          transform: scale(1.1);
+        }
+        .hero-slider .swiper-button-prev::after,
+        .hero-slider .swiper-button-next::after {
+          font-size: 20px;
+          font-weight: bold;
+        }
+        .hero-slider .swiper-pagination-bullet {
+          width: 12px;
+          height: 12px;
+          background: white;
+          opacity: 0.5;
+        }
+        .hero-slider .swiper-pagination-bullet-active {
+          background: #B8860B;
+          opacity: 1;
+        }
+      `}</style>
       <Swiper
         modules={[Autoplay, Navigation, Pagination, EffectFade]}
         effect="fade"

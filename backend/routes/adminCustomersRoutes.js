@@ -134,4 +134,68 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+// PUT /api/admin/customers/:id - Modifier un client
+router.put('/:id', async (req, res) => {
+    const customerId = req.params.id;
+    const { first_name, last_name, email, phone, loyalty_points } = req.body;
+
+    try {
+        const promiseDb = db.promise();
+
+        // Vérifier que le client existe
+        const [customers] = await promiseDb.query('SELECT id FROM customers WHERE id = ?', [customerId]);
+        if (customers.length === 0) {
+            return res.status(404).json({ error: 'Client non trouvé' });
+        }
+
+        // Mettre à jour le client
+        await promiseDb.query(
+            'UPDATE customers SET first_name = ?, last_name = ?, email = ?, phone = ?, loyalty_points = ? WHERE id = ?',
+            [first_name || '', last_name || '', email || '', phone || '', loyalty_points || 0, customerId]
+        );
+
+        console.log(`✅ Admin: Client #${customerId} mis à jour`);
+
+        res.json({
+            success: true,
+            message: 'Client mis à jour',
+            customer: { id: parseInt(customerId), first_name, last_name, email, phone, loyalty_points }
+        });
+    } catch (error) {
+        console.error('Error updating customer:', error);
+        res.status(500).json({ error: 'Erreur serveur lors de la mise à jour' });
+    }
+});
+
+// DELETE /api/admin/customers/:id - Supprimer un client
+router.delete('/:id', async (req, res) => {
+    const customerId = req.params.id;
+
+    try {
+        const promiseDb = db.promise();
+
+        // Vérifier que le client existe
+        const [customers] = await promiseDb.query('SELECT id, phone FROM customers WHERE id = ?', [customerId]);
+        if (customers.length === 0) {
+            return res.status(404).json({ error: 'Client non trouvé' });
+        }
+
+        // Supprimer les adresses du client
+        await promiseDb.query('DELETE FROM addresses WHERE customer_id = ?', [customerId]);
+
+        // Mettre les commandes à customer_id = NULL (on garde l'historique)
+        await promiseDb.query('UPDATE orders SET customer_id = NULL WHERE customer_id = ?', [customerId]);
+
+        // Supprimer le client
+        await promiseDb.query('DELETE FROM customers WHERE id = ?', [customerId]);
+
+        console.log(`✅ Admin: Client #${customerId} supprimé`);
+
+        res.json({ success: true, message: 'Client supprimé' });
+    } catch (error) {
+        console.error('Error deleting customer:', error);
+        res.status(500).json({ error: 'Erreur serveur lors de la suppression' });
+    }
+});
+
 module.exports = router;

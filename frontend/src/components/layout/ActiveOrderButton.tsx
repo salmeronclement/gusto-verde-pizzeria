@@ -21,7 +21,7 @@ export default function ActiveOrderButton() {
     <div className="fixed bottom-6 right-6 z-50 animate-bounce-slow">
       <Link
         to={`/suivi-commande/${lastOrder?.id}`}
-        className="flex items-center gap-3 bg-red-600 text-white px-6 py-3 rounded-full shadow-lg hover:bg-red-700 transition-colors border-2 border-white"
+        className="flex items-center gap-3 bg-primary text-white px-6 py-3 rounded-full shadow-lg hover:bg-green-700 transition-colors border-2 border-white"
       >
         <span className="relative flex h-3 w-3">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>

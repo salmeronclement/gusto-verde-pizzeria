@@ -115,7 +115,7 @@ const Menu: React.FC = () => {
         <div className="min-h-screen bg-gray-50 pt-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-8">
-                    <h1 className="font-display text-4xl md:text-5xl font-bold text-dark mb-4">
+                    <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-dark mb-4">
                         Notre Carte
                     </h1>
                     <p className="text-lg text-gray-600">
@@ -223,7 +223,7 @@ const Menu: React.FC = () => {
                                 <p className="text-gray-500 mb-8 -mt-6 italic">
                                     {category.description}
                                 </p>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
                                     {categoryProducts.map(product => (
                                         <ProductCard
                                             key={product.id}

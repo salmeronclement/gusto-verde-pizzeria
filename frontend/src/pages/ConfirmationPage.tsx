@@ -2,11 +2,13 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
 import { useCartStore } from '../store/useCartStore';
+import { useOrderHistoryStore } from '../store/useOrderHistoryStore';
 
 export default function ConfirmationPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const { clearCart } = useCartStore();
+    const { addOrder } = useOrderHistoryStore();
 
     const state = location.state as {
         orderId?: string;
@@ -21,22 +23,24 @@ export default function ConfirmationPage() {
     React.useEffect(() => {
         console.log('ConfirmationPage: orderId', orderId);
         if (orderId) {
-            // Sauvegarder la commande dans le localStorage pour le bouton flottant
-            const activeOrder = {
+            // Créer un objet commande minimal pour l'historique
+            const newOrder: any = {
                 id: orderId,
-                timestamp: Date.now(),
-                status: 'active' // On suppose qu'elle est active au début
+                created_at: new Date().toISOString(),
+                status: 'en attente', // Statut initial par défaut
+                total: state?.total || 0,
+                total_amount: state?.total || 0,
+                mode: state?.mode || 'emporter',
+                items: state?.items || []
             };
-            console.log('ConfirmationPage: saving to localStorage', activeOrder);
-            localStorage.setItem('activeOrder', JSON.stringify(activeOrder));
 
-            // Notify ActiveOrderButton to update immediately
-            window.dispatchEvent(new Event('active-order-updated'));
+            console.log('ConfirmationPage: adding to history store', newOrder);
+            addOrder(newOrder);
 
             // Clear cart now that we are safely here
             clearCart();
         }
-    }, [orderId, clearCart]);
+    }, [orderId, clearCart, addOrder]);
 
     if (!orderId) {
         return (

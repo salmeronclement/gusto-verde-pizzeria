@@ -13,20 +13,13 @@ export default function ActiveOrderButton() {
   const isActive = lastOrder &&
     !['livree', 'annulee'].includes(lastOrder.status.toLowerCase());
 
-  // Debug logs
-  React.useEffect(() => {
-    console.log('ActiveOrderButton - Orders:', orders);
-    console.log('ActiveOrderButton - LastOrder:', lastOrder);
-    console.log('ActiveOrderButton - IsActive:', isActive);
-  }, [orders, lastOrder, isActive]);
-
   // Ne pas afficher si on est déjà sur la page de suivi ou dans l'admin
   if (!isActive || location.pathname === '/suivi-commande' || location.pathname.startsWith('/admin')) {
     return null;
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 animate-bounce">
+    <div className="fixed bottom-6 left-6 z-50 animate-bounce">
       <Link
         to={`/suivi-commande/${lastOrder?.id}`}
         className="flex items-center gap-3 bg-primary text-white px-6 py-3 rounded-full shadow-lg hover:bg-green-700 transition-colors border-2 border-white"

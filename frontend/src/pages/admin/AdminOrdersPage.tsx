@@ -4,6 +4,7 @@ import {
   updateOrderStatus,
   getAdminDrivers,
   assignDriverToOrder,
+  getAdminSettings,
   AdminOrder,
   Driver,
   api // Ensure api is imported for the delete call
@@ -18,7 +19,8 @@ import {
   AlertCircle,
   ShoppingBag,
   Gift,
-  Trash2
+  Trash2,
+  Volume2
 } from 'lucide-react';
 import AdminOrderDetails from '../../components/admin/AdminOrderDetails';
 
@@ -29,6 +31,22 @@ const AdminOrdersPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<number | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null);
+
+  // Settings for alerts
+  const [alertEnabled, setAlertEnabled] = useState(false);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+  const knownOrderIdsRef = React.useRef<Set<number>>(new Set());
+  const isFirstLoadRef = React.useRef(true);
+
+  // Initialize Audio & Settings
+  useEffect(() => {
+    audioRef.current = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+    audioRef.current.volume = 1.0;
+
+    getAdminSettings().then(settings => {
+      setAlertEnabled(settings.enable_new_order_alert === true || settings.enable_new_order_alert === 'true');
+    }).catch(console.error);
+  }, []);
 
   // Synchronisation avec le Store
   const { serviceStatus, fetchServiceStatus } = useServiceStore();
@@ -49,6 +67,29 @@ const AdminOrdersPage: React.FC = () => {
         getAdminOrders(),
         getAdminDrivers()
       ]);
+
+      // New Order Detection Logic
+      if (ordersData.length > 0) {
+        const currentIds = new Set(ordersData.map((o: AdminOrder) => o.id)) as Set<number>;
+
+        // If not first load, check for new IDs
+        if (!isFirstLoadRef.current) {
+          const newOrders = ordersData.filter((o: AdminOrder) => !knownOrderIdsRef.current.has(o.id));
+          if (newOrders.length > 0) {
+            // Play Sound
+            if (alertEnabled) {
+              audioRef.current?.play().catch(e => console.warn("Audio blocked:", e));
+              // Popup popus if single new order
+              if (newOrders.length === 1) {
+                setSelectedOrder(newOrders[0]);
+              }
+            }
+          }
+        }
+        knownOrderIdsRef.current = currentIds;
+        isFirstLoadRef.current = false;
+      }
+
       setOrders(ordersData);
       setDrivers(driversData);
     } catch (err) {
@@ -164,11 +205,16 @@ const AdminOrdersPage: React.FC = () => {
       <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
         <div className="flex items-center gap-3">
           <ShoppingBag className="text-green-600" size={24} />
-          <h1 className="text-xl font-bold text-gray-800">
+          <h1 className="text-xl font-bold text-gray-800 flex items-center gap-3">
             Commandes en cours
-            <span className="ml-2 text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+            <span className="text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
               {orders.length}
             </span>
+            {alertEnabled && (
+              <span className="text-orange-500 bg-orange-100 p-1 rounded-full" title="Alerte Sonore Active">
+                <Volume2 size={16} />
+              </span>
+            )}
           </h1>
         </div>
 

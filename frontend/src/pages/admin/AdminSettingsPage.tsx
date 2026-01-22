@@ -46,6 +46,7 @@ interface SettingsState {
     min_order: string;
     emergency_close: boolean;
     auto_print_on_validate: boolean;
+    enable_new_order_alert: boolean; // NEW
     schedule: ScheduleItem[];
 }
 
@@ -63,6 +64,7 @@ const AdminSettingsPage: React.FC = () => {
         min_order: '0',
         emergency_close: false,
         auto_print_on_validate: false,
+        enable_new_order_alert: false, // Default false
         schedule: []
     });
 
@@ -103,6 +105,7 @@ const AdminSettingsPage: React.FC = () => {
                 ...data,
                 emergency_close: data.emergency_close === true || data.emergency_close === 'true',
                 auto_print_on_validate: data.auto_print_on_validate === true || data.auto_print_on_validate === 'true',
+                enable_new_order_alert: data.enable_new_order_alert === true || data.enable_new_order_alert === 'true', // Handle string/bool
                 schedule: finalSchedule,
                 delivery_zones: safeParse(data.delivery_zones, []),
                 loyalty_program: safeParse(data.loyalty_program, { enabled: false, target_pizzas: 10 }),
@@ -282,6 +285,28 @@ const AdminSettingsPage: React.FC = () => {
                                     onChange={(e) => setSettings({ ...settings, auto_print_on_validate: e.target.checked })}
                                 />
                                 <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+
+                        {/* Order Alert (Sound + Popup) */}
+                        <div className="bg-orange-50 border border-orange-100 rounded-xl p-6 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-orange-100 p-3 rounded-full text-orange-600">
+                                    <AlertTriangle size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-orange-900 text-lg">Alerte Sonore & Popup</h3>
+                                    <p className="text-orange-700 text-sm">Joue un son et ouvre la commande dès réception.</p>
+                                </div>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    checked={settings.enable_new_order_alert}
+                                    onChange={(e) => setSettings({ ...settings, enable_new_order_alert: e.target.checked })}
+                                />
+                                <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-orange-600"></div>
                             </label>
                         </div>
 

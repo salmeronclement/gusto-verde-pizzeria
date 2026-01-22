@@ -32,18 +32,47 @@ export default function LoginPage() {
     const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
     // Initialiser reCAPTCHA
+    // Initialiser reCAPTCHA
     useEffect(() => {
-        if (!window.recaptchaVerifier && recaptchaContainerRef.current) {
-            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                size: 'invisible',
-                callback: () => {
-                    console.log('reCAPTCHA résolu');
-                },
-                'expired-callback': () => {
-                    console.log('reCAPTCHA expiré');
-                }
-            });
+        // Nettoyage préventif
+        if (window.recaptchaVerifier) {
+            try {
+                window.recaptchaVerifier.clear();
+            } catch (e) {
+                console.warn('Erreur nettoyage reCAPTCHA:', e);
+            }
+            // @ts-ignore
+            window.recaptchaVerifier = undefined;
         }
+
+        if (!window.recaptchaVerifier && recaptchaContainerRef.current) {
+            try {
+                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                    size: 'invisible',
+                    callback: () => {
+                        console.log('reCAPTCHA résolu');
+                    },
+                    'expired-callback': () => {
+                        console.log('reCAPTCHA expiré');
+                    }
+                });
+            } catch (error) {
+                console.error('Erreur init reCAPTCHA:', error);
+            }
+        }
+
+        // Cleanup au démontage
+        return () => {
+            if (window.recaptchaVerifier) {
+                try {
+                    window.recaptchaVerifier.clear();
+                } catch (e) {
+                    // Ignore
+                }
+                // @ts-ignore
+                window.recaptchaVerifier = undefined;
+            }
+        };
     }, []);
 
     // Formater le numéro pour l'affichage

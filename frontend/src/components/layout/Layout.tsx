@@ -3,6 +3,7 @@ import { ReactNode, useEffect } from 'react'
 import Header from './Header'
 import Footer from './Footer'
 import ServiceStatusBanner from '../ui/ServiceStatusBanner'
+import AnnouncementBanner from '../ui/AnnouncementBanner'
 import { useServiceStore } from '../../store/useServiceStore'
 
 import ActiveOrderButton from './ActiveOrderButton'
@@ -21,6 +22,7 @@ export default function Layout({ children }: LayoutProps) {
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
+            <AnnouncementBanner />
             {/* <ServiceStatusBanner /> */}
             <main className="flex-1">{children || <Outlet />}</main>
             <ActiveOrderButton />

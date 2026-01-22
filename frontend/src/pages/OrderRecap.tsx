@@ -458,8 +458,15 @@ const OrderRecap: React.FC = () => {
                                             type="tel"
                                             className="w-full pl-10 p-3 bg-gray-50 rounded-lg border-2 border-transparent focus:border-primary outline-none transition-colors font-medium"
                                             value={customerInfo.phone}
-                                            onChange={e => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
-                                            placeholder="06 12 34 56 78"
+                                            onChange={e => {
+                                                // Filtrer pour ne garder que les chiffres et limiter à 10
+                                                const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                                setCustomerInfo({ ...customerInfo, phone: digits });
+                                            }}
+                                            placeholder="0612345678"
+                                            maxLength={10}
+                                            pattern="[0-9]{10}"
+                                            inputMode="numeric"
                                         />
                                     </div>
                                 </div>

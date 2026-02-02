@@ -22,7 +22,7 @@ export default function AnnouncementBanner() {
     }
 
     return (
-        <div className="bg-gradient-to-r from-primary to-accent text-white px-4 py-3 shadow-md relative z-50">
+        <div className="bg-gradient-to-r from-primary to-accent text-white px-4 py-3 shadow-md relative z-40">
             <div className="max-w-7xl mx-auto flex items-center justify-center gap-3 text-sm sm:text-base font-medium">
                 <Megaphone size={20} className="text-white/80 flex-shrink-0" />
                 <span className="text-center">{message}</span>

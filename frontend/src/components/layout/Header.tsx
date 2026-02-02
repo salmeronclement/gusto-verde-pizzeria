@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { Menu, X, Search, ShoppingBag, Phone, MapPin, Mail, Facebook, Instagram, User } from 'lucide-react'
 // 👇 Correction de l'import ici (c'était useStore avant)
-import { useCartStore } from '../../store/useCartStore' 
+import { useCartStore } from '../../store/useCartStore'
 import { useAuthStore } from '../../store/useAuthStore'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -11,11 +11,11 @@ export default function Header() {
     const [searchOpen, setSearchOpen] = useState(false)
     const [scrolled, setScrolled] = useState(false)
     const location = useLocation()
-    
+
     // Récupération des items depuis le bon store
     const cartItems = useCartStore(state => state.items)
     const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0) // Calcul précis de la quantité totale
-    
+
     const { isAuthenticated } = useAuthStore()
 
     const isActive = (path: string) => location.pathname === path
@@ -174,14 +174,14 @@ export default function Header() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setMobileMenuOpen(false)}
-                            className="fixed inset-0 bg-black/50 z-50 lg:hidden backdrop-blur-sm"
+                            className="fixed inset-0 bg-black/50 z-[100] lg:hidden backdrop-blur-sm"
                         />
                         <motion.div
                             initial={{ x: '100%' }}
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="fixed top-0 right-0 h-full w-[80%] max-w-sm bg-cream shadow-2xl z-50 lg:hidden overflow-y-auto"
+                            className="fixed top-0 right-0 h-full w-[80%] max-w-sm bg-cream shadow-2xl z-[100] lg:hidden overflow-y-auto"
                         >
                             <div className="p-6">
                                 <div className="flex justify-between items-center mb-8">

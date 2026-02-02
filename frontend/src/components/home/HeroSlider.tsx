@@ -111,6 +111,7 @@ export default function HeroSlider() {
           color: white;
           transition: all 0.3s ease;
           backdrop-filter: blur(4px);
+          display: none; /* Hide on mobile to prevent overlap */
         }
         .hero-slider .swiper-button-prev:after,
         .hero-slider .swiper-button-next:after {
@@ -122,6 +123,9 @@ export default function HeroSlider() {
             .hero-slider .swiper-button-next {
               width: 56px;
               height: 56px;
+              display: flex; /* Show on desktop */
+              justify-content: center;
+              align-items: center;
               background: rgba(45, 90, 61, 0.9);
             }
             .hero-slider .swiper-button-prev:after,

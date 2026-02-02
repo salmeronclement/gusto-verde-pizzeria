@@ -29,6 +29,14 @@ interface PublicSettings {
     announcement_message: string;
     loyalty_program: LoyaltyProgram;
     promo_offer: PromoOffer;
+    contact_info: ContactInfo;
+}
+
+interface ContactInfo {
+    phone: string;
+    address: string;
+    email: string;
+    brand_name: string;
 }
 
 export interface LoyaltyProgram {

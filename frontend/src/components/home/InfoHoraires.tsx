@@ -1,4 +1,5 @@
-
+import { useEffect } from 'react'
+import { useSettingsStore } from '../../store/useSettingsStore'
 
 // Import real SVG icons
 import fireIcon from '../../assets/images/fire-wood-svgrepo-com.svg'
@@ -8,6 +9,37 @@ import farineImg from '../../assets/images/farine-selection-accueil-dolce.png'
 import paymentLogos from '../../assets/images/Moyens-paiement-dolce-pizza-marseille-livraison-pizza.png'
 
 export default function InfoHoraires() {
+    const { settings, fetchPublicSettings } = useSettingsStore()
+
+    useEffect(() => {
+        if (!settings) {
+            fetchPublicSettings()
+        }
+    }, [settings, fetchPublicSettings])
+
+    // Helper to format hours display
+    const getHoursDisplay = () => {
+        if (!settings?.schedule || settings.schedule.length === 0) {
+            return { text: 'Ouvert 7j/7', hours: '17h30 - 22h15' }
+        }
+
+        const openDays = settings.schedule.filter((d: any) => !d.closed)
+        if (openDays.length === 7) {
+            // Check if all have same hours
+            const firstHours = `${openDays[0].open} - ${openDays[0].close}`
+            const allSame = openDays.every((d: any) => `${d.open} - ${d.close}` === firstHours)
+            if (allSame) {
+                return { text: 'Ouvert 7j/7', hours: firstHours }
+            }
+        }
+
+        return { text: 'Ouvert', hours: 'Voir horaires' }
+    }
+
+    const { text, hours } = getHoursDisplay()
+    const phoneNumber = settings?.contact_info?.phone || '04 91 555 444'
+    const phoneLink = phoneNumber.replace(/\s/g, '')
+
     return (
         <section className="py-16 bg-gray-50">
             <div className="container-custom">
@@ -69,19 +101,19 @@ export default function InfoHoraires() {
 
                             <div className="space-y-4 text-center">
                                 <div>
-                                    <p className="text-lg font-semibold mb-2">Ouvert 7j/7</p>
+                                    <p className="text-lg font-semibold mb-2">{text}</p>
                                     <p className="text-3xl font-display font-bold">
-                                        17h30 - 22h15
+                                        {hours}
                                     </p>
                                 </div>
 
                                 <div className="border-t border-white border-opacity-30 pt-4 mt-4">
                                     <p className="text-sm mb-3 opacity-90">Commandez dès maintenant</p>
                                     <a
-                                        href="tel:0491555444"
+                                        href={`tel:${phoneLink}`}
                                         className="inline-block bg-white text-primary font-bold text-2xl py-4 px-8 rounded-lg hover:bg-gray-100 transition-colors"
                                     >
-                                        04 91 555 444
+                                        {phoneNumber}
                                     </a>
                                 </div>
 

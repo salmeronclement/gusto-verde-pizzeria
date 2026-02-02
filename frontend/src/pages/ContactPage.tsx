@@ -8,7 +8,12 @@ export default function ContactPage() {
 
     React.useEffect(() => {
         fetchPublicSettings();
-    }, []);
+    }, [fetchPublicSettings]);
+
+    const phone = settings?.contact_info?.phone || '04 91 555 444'
+    const address = settings?.contact_info?.address || '24 boulevard Notre Dame, 13006 Marseille'
+    const email = settings?.contact_info?.email || 'contact@dolce-pizza-marseille.com'
+    const phoneLink = phone.replace(/\s/g, '')
 
     return (
         <div className="min-h-screen bg-white">
@@ -43,7 +48,7 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-lg mb-1">Adresse</h3>
-                                        <p className="text-gray-600">24 boulevard Notre Dame,<br />13006 Marseille</p>
+                                        <p className="text-gray-600">{address}</p>
                                     </div>
                                 </div>
 
@@ -53,8 +58,8 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-lg mb-1">Téléphone</h3>
-                                        <a href="tel:0491555444" className="text-gray-600 hover:text-primary transition-colors">
-                                            04 91 555 444
+                                        <a href={`tel:${phoneLink}`} className="text-gray-600 hover:text-primary transition-colors">
+                                            {phone}
                                         </a>
                                     </div>
                                 </div>
@@ -65,8 +70,8 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-lg mb-1">Email</h3>
-                                        <a href="mailto:contact@dolce-pizza-marseille.com" className="text-gray-600 hover:text-primary transition-colors">
-                                            contact@dolce-pizza-marseille.com
+                                        <a href={`mailto:${email}`} className="text-gray-600 hover:text-primary transition-colors">
+                                            {email}
                                         </a>
                                     </div>
                                 </div>

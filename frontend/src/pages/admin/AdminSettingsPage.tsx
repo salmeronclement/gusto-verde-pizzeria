@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getAdminSettings, updateAdminSettings, getAdminProducts, bulkUpdateProducts } from '../../services/api';
 import {
     Save, Store, Truck, Gift, Plus, Trash2, AlertTriangle,
-    Clock, MapPin, Percent, Info
+    Clock, MapPin, Percent, Info, Phone, Mail
 } from 'lucide-react';
 import { Product } from '../../types';
 
@@ -37,6 +37,13 @@ interface PromoOffer {
     item_type: string;
 }
 
+interface ContactInfo {
+    phone: string;
+    address: string;
+    email: string;
+    brand_name: string;
+}
+
 interface SettingsState {
     delivery_zones: DeliveryTier[];
     loyalty_program: LoyaltyProgram;
@@ -48,10 +55,11 @@ interface SettingsState {
     auto_print_on_validate: boolean;
     enable_new_order_alert: boolean; // NEW
     schedule: ScheduleItem[];
+    contact_info: ContactInfo;
 }
 
 const AdminSettingsPage: React.FC = () => {
-    const [activeTab, setActiveTab] = useState<'restaurant' | 'delivery' | 'marketing'>('restaurant');
+    const [activeTab, setActiveTab] = useState<'restaurant' | 'delivery' | 'marketing' | 'contact'>('restaurant');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [products, setProducts] = useState<Product[]>([]);
@@ -65,7 +73,13 @@ const AdminSettingsPage: React.FC = () => {
         emergency_close: false,
         auto_print_on_validate: false,
         enable_new_order_alert: false, // Default false
-        schedule: []
+        schedule: [],
+        contact_info: {
+            phone: '04 91 555 444',
+            address: '24 boulevard Notre Dame, 13006 Marseille',
+            email: 'contact@gustoverde.fr',
+            brand_name: 'Gusto Verde'
+        }
     });
 
     useEffect(() => {
@@ -109,7 +123,13 @@ const AdminSettingsPage: React.FC = () => {
                 schedule: finalSchedule,
                 delivery_zones: safeParse(data.delivery_zones, []),
                 loyalty_program: safeParse(data.loyalty_program, { enabled: false, target_pizzas: 10 }),
-                promo_offer: safeParse(data.promo_offer, { enabled: false, buy_quantity: 3, get_quantity: 1, item_type: 'pizza' })
+                promo_offer: safeParse(data.promo_offer, { enabled: false, buy_quantity: 3, get_quantity: 1, item_type: 'pizza' }),
+                contact_info: safeParse(data.contact_info, {
+                    phone: '04 91 555 444',
+                    address: '24 boulevard Notre Dame, 13006 Marseille',
+                    email: 'contact@gustoverde.fr',
+                    brand_name: 'Gusto Verde'
+                })
             });
         } catch (error) {
             console.error('Error fetching settings:', error);
@@ -235,6 +255,12 @@ const AdminSettingsPage: React.FC = () => {
                     className={`px-6 py-3 font-medium flex items-center gap-2 border-b-2 transition-colors whitespace-nowrap ${activeTab === 'marketing' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
                 >
                     <Gift size={20} /> Fidélité & Promos
+                </button>
+                <button
+                    onClick={() => setActiveTab('contact')}
+                    className={`px-6 py-3 font-medium flex items-center gap-2 border-b-2 transition-colors whitespace-nowrap ${activeTab === 'contact' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                >
+                    <Phone size={20} /> Coordonnées
                 </button>
             </div>
 
@@ -662,6 +688,93 @@ const AdminSettingsPage: React.FC = () => {
                                             </label>
                                         ))}
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* TAB 4: CONTACT */}
+                {activeTab === 'contact' && (
+                    <div className="space-y-8">
+                        <div className="bg-blue-50 border border-blue-100 rounded-xl p-6">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="bg-blue-100 p-2 rounded-lg text-blue-600">
+                                    <Phone size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-blue-900 text-lg">Coordonnées du Restaurant</h3>
+                                    <p className="text-sm text-blue-700">Ces informations s'affichent sur le site client (Header, Footer, Contact)</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block font-bold text-gray-700 mb-2">
+                                        <Phone className="inline mr-2" size={16} />
+                                        Numéro de téléphone
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        value={settings.contact_info.phone}
+                                        onChange={(e) => setSettings({
+                                            ...settings,
+                                            contact_info: { ...settings.contact_info, phone: e.target.value }
+                                        })}
+                                        className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary"
+                                        placeholder="Ex: 04 91 555 444"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block font-bold text-gray-700 mb-2">
+                                        <MapPin className="inline mr-2" size={16} />
+                                        Adresse complète
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={settings.contact_info.address}
+                                        onChange={(e) => setSettings({
+                                            ...settings,
+                                            contact_info: { ...settings.contact_info, address: e.target.value }
+                                        })}
+                                        className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary"
+                                        placeholder="Ex: 24 boulevard Notre Dame, 13006 Marseille"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block font-bold text-gray-700 mb-2">
+                                        <Mail className="inline mr-2" size={16} />
+                                        Email de contact
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={settings.contact_info.email}
+                                        onChange={(e) => setSettings({
+                                            ...settings,
+                                            contact_info: { ...settings.contact_info, email: e.target.value }
+                                        })}
+                                        className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary"
+                                        placeholder="Ex: contact@gustoverde.fr"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block font-bold text-gray-700 mb-2">
+                                        <Store className="inline mr-2" size={16} />
+                                        Nom de l'établissement
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={settings.contact_info.brand_name}
+                                        onChange={(e) => setSettings({
+                                            ...settings,
+                                            contact_info: { ...settings.contact_info, brand_name: e.target.value }
+                                        })}
+                                        className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary"
+                                        placeholder="Ex: Gusto Verde"
+                                    />
                                 </div>
                             </div>
                         </div>

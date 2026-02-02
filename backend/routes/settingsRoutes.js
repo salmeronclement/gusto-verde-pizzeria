@@ -27,7 +27,13 @@ router.get('/public', async (req, res) => {
             emergency_close: settings.emergency_close === true || settings.emergency_close === 'true',
             announcement_message: settings.announcement_message || '',
             loyalty_program: settings.loyalty_program || { enabled: false, target_pizzas: 10, require_purchase_for_reward: true },
-            promo_offer: settings.promo_offer || { enabled: false, buy_quantity: 3, get_quantity: 1, item_type: 'pizza' }
+            promo_offer: settings.promo_offer || { enabled: false, buy_quantity: 3, get_quantity: 1, item_type: 'pizza' },
+            contact_info: settings.contact_info || {
+                phone: '04 91 555 444',
+                address: '24 boulevard Notre Dame, 13006 Marseille',
+                email: 'contact@gustoverde.fr',
+                brand_name: 'Gusto Verde'
+            }
         };
 
         console.log('📋 [Backend] Public Settings - loyalty_program:', publicSettings.loyalty_program);

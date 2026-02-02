@@ -1,8 +1,16 @@
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSettingsStore } from '../../store/useSettingsStore'
 
 export default function Footer() {
     const [email, setEmail] = useState('')
+    const { settings, fetchPublicSettings } = useSettingsStore()
+
+    useEffect(() => {
+        if (!settings) {
+            fetchPublicSettings()
+        }
+    }, [settings, fetchPublicSettings])
 
     const handleNewsletterSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -10,6 +18,12 @@ export default function Footer() {
         console.log('Newsletter subscription:', email)
         setEmail('')
     }
+
+    const phone = settings?.contact_info?.phone || '04 91 555 444'
+    const address = settings?.contact_info?.address || '24 boulevard Notre Dame, 13006 Marseille'
+    const contactEmail = settings?.contact_info?.email || 'contact@gustoverde.fr'
+    const brandName = settings?.contact_info?.brand_name || 'Gusto Verde'
+    const phoneLink = phone.replace(/\s/g, '')
 
     return (
         <footer
@@ -105,7 +119,7 @@ export default function Footer() {
                                     <i className="fa-solid fa-location-dot text-white text-sm"></i>
                                 </div>
                                 <p className="text-gray-300 text-sm pt-2">
-                                    24 boulevard Notre Dame, 13006 Marseille
+                                    {address}
                                 </p>
                             </div>
                             <div className="flex gap-3">
@@ -114,10 +128,10 @@ export default function Footer() {
                                 </div>
                                 <p className="text-gray-300 text-sm pt-2">
                                     <a
-                                        href="tel:+33491555444"
+                                        href={`tel:+33${phoneLink.substring(1)}`}
                                         className="hover:text-primary transition-colors"
                                     >
-                                        04 91 555 444
+                                        {phone}
                                     </a>
                                 </p>
                             </div>
@@ -127,10 +141,10 @@ export default function Footer() {
                                 </div>
                                 <p className="text-gray-300 text-sm pt-2">
                                     <a
-                                        href="mailto:contact@gustoverde.fr"
+                                        href={`mailto:${contactEmail}`}
                                         className="hover:text-primary transition-colors break-all"
                                     >
-                                        contact@gustoverde.fr
+                                        {contactEmail}
                                     </a>
                                 </p>
                             </div>
@@ -176,7 +190,7 @@ export default function Footer() {
                             <p className="text-sm text-gray-400">
                                 Copyright © 2024{' '}
                                 <span className="text-white font-semibold">
-                                    GUSTO VERDE
+                                    {brandName.toUpperCase()}
                                 </span>
                                 . Tous droits réservés.
                             </p>

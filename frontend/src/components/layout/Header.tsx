@@ -4,6 +4,7 @@ import { Menu, X, Search, ShoppingBag, Phone, MapPin, Mail, Facebook, Instagram,
 // 👇 Correction de l'import ici (c'était useStore avant)
 import { useCartStore } from '../../store/useCartStore'
 import { useAuthStore } from '../../store/useAuthStore'
+import { useSettingsStore } from '../../store/useSettingsStore'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function Header() {
@@ -17,6 +18,18 @@ export default function Header() {
     const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0) // Calcul précis de la quantité totale
 
     const { isAuthenticated } = useAuthStore()
+    const { settings, fetchPublicSettings } = useSettingsStore()
+
+    useEffect(() => {
+        if (!settings) {
+            fetchPublicSettings()
+        }
+    }, [settings, fetchPublicSettings])
+
+    const phone = settings?.contact_info?.phone || '04 91 555 444'
+    const address = settings?.contact_info?.address || '24 boulevard Notre Dame, 13006 Marseille'
+    const email = settings?.contact_info?.email || 'contact@gustoverde.fr'
+    const phoneLink = phone.replace(/\s/g, '')
 
     const isActive = (path: string) => location.pathname === path
 
@@ -35,17 +48,17 @@ export default function Header() {
             <div className="bg-forest text-white py-2 text-xs md:text-sm font-medium">
                 <div className="container-custom flex justify-between items-center">
                     <div className="hidden lg:flex items-center gap-6">
-                        <a href="https://maps.google.com/?q=24+bd+Notre+Dame,13006+Marseille" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
+                        <a href={`https://maps.google.com/?q=${encodeURIComponent(address)}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
                             <MapPin size={14} />
-                            <span>24 bd Notre Dame, 13006 Marseille</span>
+                            <span>{address}</span>
                         </a>
-                        <a href="tel:0491555444" className="flex items-center gap-2 hover:text-primary transition-colors">
+                        <a href={`tel:${phoneLink}`} className="flex items-center gap-2 hover:text-primary transition-colors">
                             <Phone size={14} />
-                            <span>04 91 555 444</span>
+                            <span>{phone}</span>
                         </a>
-                        <a href="mailto:contact@gustoverde.fr" className="flex items-center gap-2 hover:text-primary transition-colors">
+                        <a href={`mailto:${email}`} className="flex items-center gap-2 hover:text-primary transition-colors">
                             <Mail size={14} />
-                            <span>contact@gustoverde.fr</span>
+                            <span>{email}</span>
                         </a>
                     </div>
                     <div className="flex items-center gap-4 ml-auto lg:ml-0">

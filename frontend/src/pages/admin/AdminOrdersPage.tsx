@@ -202,7 +202,7 @@ const AdminOrdersPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* En-tête avec titre et boutons */}
-      <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
         <div className="flex items-center gap-3">
           <ShoppingBag className="text-green-600" size={24} />
           <h1 className="text-xl font-bold text-gray-800 flex items-center gap-3">

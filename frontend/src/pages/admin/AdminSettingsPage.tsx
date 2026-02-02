@@ -329,7 +329,7 @@ const AdminSettingsPage: React.FC = () => {
                             </h3>
                             <div className="grid gap-4">
                                 {settings.schedule.map((day, index) => (
-                                    <div key={day.day} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                                    <div key={day.day} className="flex flex-wrap items-center gap-2 md:gap-4 p-3 bg-gray-50 rounded-lg">
                                         <span className="w-24 font-medium">{day.day}</span>
                                         <label className="flex items-center gap-2 cursor-pointer">
                                             <input
@@ -451,7 +451,7 @@ const AdminSettingsPage: React.FC = () => {
                                                     </div>
                                                 ))}
                                             </div>
-                                            <div className="flex gap-2 items-center bg-gray-50 p-2 rounded-lg border border-gray-100 max-w-2xl">
+                                            <div className="flex flex-col md:flex-row gap-2 items-stretch md:items-center bg-gray-50 p-2 rounded-lg border border-gray-100 max-w-2xl">
                                                 <input type="text" placeholder="Code Postal" className="w-24 px-3 py-1 border rounded text-sm" id={`zip-${tierIndex}`} />
                                                 <input type="text" placeholder="Ville" className="flex-1 px-3 py-1 border rounded text-sm" id={`city-${tierIndex}`} />
                                                 <button
@@ -518,7 +518,7 @@ const AdminSettingsPage: React.FC = () => {
                             <div className={`${!settings.loyalty_program.enabled ? 'opacity-50 pointer-events-none' : ''}`}>
                                 <div className="bg-white rounded-lg p-4 border border-blue-100">
                                     <label className="block text-sm font-bold text-blue-800 mb-2">Combien de pizzas pour une gratuite ?</label>
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex flex-col md:flex-row items-center gap-4">
                                         <input
                                             type="number"
                                             min="1"

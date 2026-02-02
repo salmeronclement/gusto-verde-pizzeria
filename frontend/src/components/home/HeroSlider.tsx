@@ -178,7 +178,7 @@ export default function HeroSlider() {
 
                     <a
                       href="/menu"
-                      className="inline-block bg-primary hover:bg-accent text-white font-bold text-lg px-8 py-4 rounded-full transition-all hover:scale-105"
+                      className="inline-block bg-primary hover:bg-accent text-white font-bold text-base px-6 py-3 md:text-lg md:px-8 md:py-4 rounded-full transition-all hover:scale-105"
                     >
                       Commander maintenant
                     </a>

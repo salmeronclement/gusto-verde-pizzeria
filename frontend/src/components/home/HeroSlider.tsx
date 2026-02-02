@@ -55,7 +55,7 @@ export default function HeroSlider() {
      ========================= */
   if (loading) {
     return (
-      <section className="relative h-[450px] md:h-[700px] bg-cream flex items-center justify-center">
+      <section className="relative h-[50vh] min-h-[400px] md:h-[700px] bg-cream flex items-center justify-center">
         <Loader2 className="w-12 h-12 animate-spin text-primary" />
       </section>
     )
@@ -66,7 +66,7 @@ export default function HeroSlider() {
      ========================= */
   if (slides.length === 0) {
     return (
-      <section className="relative h-[450px] md:h-[700px] bg-forest flex items-center">
+      <section className="relative h-[50vh] min-h-[400px] md:h-[700px] bg-forest flex items-center">
         <div className="container-custom">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -104,27 +104,40 @@ export default function HeroSlider() {
       <style>{`
         .hero-slider .swiper-button-prev,
         .hero-slider .swiper-button-next {
-          width: 56px;
-          height: 56px;
-          background: rgba(45, 90, 61, 0.9);
+          width: 40px;
+          height: 40px;
+          background: rgba(0, 0, 0, 0.3);
           border-radius: 50%;
           color: white;
           transition: all 0.3s ease;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+          backdrop-filter: blur(4px);
+        }
+        .hero-slider .swiper-button-prev:after,
+        .hero-slider .swiper-button-next:after {
+          font-size: 16px;
+          font-weight: bold;
+        }
+        @media (min-width: 768px) {
+            .hero-slider .swiper-button-prev,
+            .hero-slider .swiper-button-next {
+              width: 56px;
+              height: 56px;
+              background: rgba(45, 90, 61, 0.9);
+            }
+            .hero-slider .swiper-button-prev:after,
+            .hero-slider .swiper-button-next:after {
+              font-size: 20px;
+            }
         }
         .hero-slider .swiper-button-prev:hover,
         .hero-slider .swiper-button-next:hover {
           background: #B8860B;
           transform: scale(1.1);
-        }
-        .hero-slider .swiper-button-prev::after,
-        .hero-slider .swiper-button-next::after {
-          font-size: 20px;
-          font-weight: bold;
+          opacity: 1;
         }
         .hero-slider .swiper-pagination-bullet {
-          width: 12px;
-          height: 12px;
+          width: 8px;
+          height: 8px;
           background: white;
           opacity: 0.5;
         }
@@ -136,12 +149,13 @@ export default function HeroSlider() {
       <Swiper
         modules={[Autoplay, Navigation, Pagination, EffectFade]}
         effect="fade"
+        fadeEffect={{ crossFade: true }}
         speed={1500}
         autoplay={{ delay: 6000, disableOnInteraction: false }}
         navigation
         pagination={{ clickable: true }}
         loop
-        className="h-[450px] md:h-[700px]"
+        className="h-[50vh] min-h-[400px] md:h-[700px]"
       >
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>

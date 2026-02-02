@@ -74,7 +74,7 @@ export default function HeroSlider() {
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-bold text-white mb-6">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-white mb-6">
               Bienvenue chez <br />
               <span className="text-primary">Gusto Verde</span>
             </h1>
@@ -163,12 +163,12 @@ export default function HeroSlider() {
                 <div className="container-custom h-full relative z-10 flex items-center">
                   <div className="max-w-3xl">
                     {(slide.title || slide.subtitle) && (
-                      <h2 className="text-5xl md:text-6xl lg:text-7xl font-display font-bold text-white mb-6">
+                      <h2 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-white mb-6">
                         {slide.title}
                         {slide.subtitle && (
                           <>
                             <br />
-                            <span className="text-primary text-3xl md:text-4xl">
+                            <span className="text-primary text-2xl md:text-4xl">
                               {slide.subtitle}
                             </span>
                           </>

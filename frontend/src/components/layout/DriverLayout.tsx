@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { Bike, History, LogOut, Circle, Moon, Sun } from 'lucide-react';
+import { Bike, History, LogOut, Circle, Moon, Sun, Menu, X, User } from 'lucide-react';
 // Correction de l'import : on utilise updateDriver au lieu de updateDriverStatus
 import { getDriverProfile, updateDriverStatus } from '../../services/api';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function DriverLayout() {
     const location = useLocation();
@@ -56,6 +57,7 @@ export default function DriverLayout() {
         }
         appleIcon.href = '/driver-icon-192.png';
     }, []);
+
     useEffect(() => {
         const loadStatus = async () => {
             try {
@@ -69,6 +71,8 @@ export default function DriverLayout() {
                 }
             } catch (error) {
                 console.error('Erreur chargement statut:', error);
+                // Redirect to login if unauthorized
+                // navigate('/livreur/login');
             }
         };
         loadStatus();
@@ -110,15 +114,15 @@ export default function DriverLayout() {
 
     return (
         <div className={`min-h-screen flex flex-col transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-cream text-gray-900'}`}>
-            {/* Header Fixe - Vert Forêt (Style Admin) */}
+            {/* Header Fixe */}
             <header className={`fixed top-0 left-0 right-0 shadow-md z-50 h-16 flex items-center justify-between px-4 transition-colors duration-300 ${darkMode ? 'bg-gray-800 border-b border-gray-700' : 'bg-forest text-white'}`}>
                 <div className="flex items-center gap-2">
                     {/* Logo Gusto Verde */}
-                    <span className="text-lg sm:text-xl font-display font-bold text-white">
+                    <span className="text-lg font-display font-bold text-white">
                         Gusto <span className="text-primary">Verde</span>
                     </span>
-                    <span className="bg-white/10 text-cream/90 px-2 py-0.5 rounded text-[10px] sm:text-xs font-sans font-medium uppercase tracking-wider border border-white/10 ml-1">
-                        Espace Livreur
+                    <span className="bg-white/10 text-cream/90 px-1.5 py-0.5 rounded text-[10px] font-sans font-medium uppercase tracking-wider border border-white/10 ml-1">
+                        Livreur
                     </span>
                 </div>
 
@@ -126,7 +130,7 @@ export default function DriverLayout() {
                     {/* Dark Mode Toggle */}
                     <button
                         onClick={() => setDarkMode(!darkMode)}
-                        className={`p-2 rounded-full transition-colors ${darkMode ? 'bg-gray-700 text-yellow-400' : 'bg-white/10 text-cream hover:bg-white/20'}`}
+                        className={`p-2 rounded-full transition-colors hidden sm:flex ${darkMode ? 'bg-gray-700 text-yellow-400' : 'bg-white/10 text-cream hover:bg-white/20'}`}
                     >
                         {darkMode ? <Sun size={18} /> : <Moon size={18} />}
                     </button>
@@ -137,25 +141,42 @@ export default function DriverLayout() {
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-colors ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-white/10 border-white/20 text-white hover:bg-white/20'}`}
                         >
-                            <Circle size={12} fill="currentColor" className={getStatusColor(status)} />
-                            <span className="text-sm font-bold capitalize">
+                            <Circle size={10} fill="currentColor" className={getStatusColor(status)} />
+                            <span className="text-xs sm:text-sm font-bold capitalize">
                                 {status === 'active' ? 'Actif' : status === 'pause' ? 'Pause' : 'Off'}
                             </span>
                         </button>
 
-                        {isMenuOpen && (
-                            <div className={`absolute top-full right-0 mt-2 w-32 rounded-lg shadow-xl border overflow-hidden z-50 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
-                                <button onClick={() => handleStatusChange('active')} className={`w-full text-left px-4 py-2 text-sm font-medium flex items-center gap-2 ${darkMode ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-green-50 text-gray-700'}`}>
-                                    <Circle size={8} fill="currentColor" className="text-green-500" /> Actif
-                                </button>
-                                <button onClick={() => handleStatusChange('pause')} className={`w-full text-left px-4 py-2 text-sm font-medium flex items-center gap-2 ${darkMode ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-orange-50 text-gray-700'}`}>
-                                    <Circle size={8} fill="currentColor" className="text-orange-500" /> Pause
-                                </button>
-                                <button onClick={() => handleStatusChange('inactive')} className={`w-full text-left px-4 py-2 text-sm font-medium flex items-center gap-2 ${darkMode ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-50 text-gray-700'}`}>
-                                    <Circle size={8} fill="currentColor" className="text-gray-400" /> Off
-                                </button>
-                            </div>
-                        )}
+                        <AnimatePresence>
+                            {isMenuOpen && (
+                                <>
+                                    <motion.div
+                                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                        className="fixed inset-0 z-40 bg-black/20" onClick={() => setIsMenuOpen(false)}
+                                    />
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        className={`absolute top-full right-0 mt-2 w-32 rounded-lg shadow-xl border overflow-hidden z-50 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}
+                                    >
+                                        <button onClick={() => handleStatusChange('active')} className={`w-full text-left px-4 py-3 text-sm font-medium flex items-center gap-2 ${darkMode ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-green-50 text-gray-700'}`}>
+                                            <Circle size={8} fill="currentColor" className="text-green-500" /> Actif
+                                        </button>
+                                        <button onClick={() => handleStatusChange('pause')} className={`w-full text-left px-4 py-3 text-sm font-medium flex items-center gap-2 ${darkMode ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-orange-50 text-gray-700'}`}>
+                                            <Circle size={8} fill="currentColor" className="text-orange-500" /> Pause
+                                        </button>
+                                        <button onClick={() => handleStatusChange('inactive')} className={`w-full text-left px-4 py-3 text-sm font-medium flex items-center gap-2 ${darkMode ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-50 text-gray-700'}`}>
+                                            <Circle size={8} fill="currentColor" className="text-gray-400" /> Off
+                                        </button>
+                                        <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                                        <button onClick={() => setDarkMode(!darkMode)} className={`w-full text-left px-4 py-3 text-sm font-medium flex items-center gap-2 sm:hidden ${darkMode ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-50 text-gray-700'}`}>
+                                            {darkMode ? <Sun size={14} className="text-yellow-400" /> : <Moon size={14} />} {darkMode ? 'Mode Clair' : 'Mode Sombre'}
+                                        </button>
+                                    </motion.div>
+                                </>
+                            )}
+                        </AnimatePresence>
                     </div>
 
                     <button
@@ -168,7 +189,7 @@ export default function DriverLayout() {
             </header>
 
             {/* Zone de Contenu (Padding pour Header et Footer) */}
-            <main className="flex-1 pt-24 pb-20 px-4 overflow-y-auto">
+            <main className="flex-1 pt-16 pb-20 px-0 sm:px-4 overflow-x-hidden overflow-y-auto w-full">
                 <Outlet />
             </main>
 
@@ -179,7 +200,15 @@ export default function DriverLayout() {
                     className={`flex flex-col items-center justify-center w-full h-full transition-colors ${isActive('/livreur/dashboard') || isActive('/livreur') ? 'text-primary' : 'hover:text-white'}`}
                 >
                     <Bike size={24} />
-                    <span className="text-xs font-medium mt-1">Courses</span>
+                    <span className="text-[10px] font-medium mt-1">Courses</span>
+                </Link>
+
+                <Link
+                    to="/livreur/me"
+                    className={`flex flex-col items-center justify-center w-full h-full transition-colors ${isActive('/livreur/me') ? 'text-primary' : 'hover:text-white'}`}
+                >
+                    <User size={24} />
+                    <span className="text-[10px] font-medium mt-1">Profil</span>
                 </Link>
 
                 <Link
@@ -187,7 +216,7 @@ export default function DriverLayout() {
                     className={`flex flex-col items-center justify-center w-full h-full transition-colors ${isActive('/livreur/historique') ? 'text-primary' : 'hover:text-white'}`}
                 >
                     <History size={24} />
-                    <span className="text-xs font-medium mt-1">Historique</span>
+                    <span className="text-[10px] font-medium mt-1">Historique</span>
                 </Link>
             </nav>
         </div>

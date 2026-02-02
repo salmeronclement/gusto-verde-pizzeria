@@ -159,13 +159,13 @@ const Menu: React.FC = () => {
                                     alt="Pizza du moment"
                                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                                 />
-                                <div className="absolute top-4 left-4 bg-yellow-400 text-yellow-900 font-bold px-4 py-1 rounded-full text-sm uppercase tracking-wider shadow-lg flex items-center gap-2">
+                                <div className="absolute top-4 left-4 bg-yellow-400 text-yellow-900 font-bold px-3 py-1 md:px-4 rounded-full text-xs md:text-sm uppercase tracking-wider shadow-lg flex items-center gap-2">
                                     <Star size={16} fill="currentColor" /> Offre du Moment
                                 </div>
                             </div>
                             <div className="flex-1 text-center md:text-left space-y-4">
                                 <div>
-                                    <h2 className="font-display text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+                                    <h2 className="font-display text-3xl md:text-5xl font-bold text-gray-900 mb-2">
                                         {featuredProduct.name}
                                     </h2>
                                     <p className="text-xl text-gray-600 max-w-2xl">
@@ -223,7 +223,7 @@ const Menu: React.FC = () => {
                                 <p className="text-gray-500 mb-8 -mt-6 italic">
                                     {category.description}
                                 </p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
                                     {categoryProducts.map(product => (
                                         <ProductCard
                                             key={product.id}

@@ -1,0 +1,65 @@
+{
+    "workflow_version": "1.2.0",
+    "timestamps": {
+        "started": "2026-02-02T19:54:30Z",
+        "last_updated": "2026-02-02T20:00:00Z"
+    },
+    "mode": "initial_scan",
+    "scan_level": "deep",
+    "project_root": "c:\\Users\\Clement\\Desktop\\Projet_web\\New_concept_pizzeria",
+    "output_folder": "c:\\Users\\Clement\\Desktop\\Projet_web\\New_concept_pizzeria\\docs",
+    "completed_steps": [
+        {
+            "step": "step_1",
+            "status": "completed",
+            "timestamp": "2026-02-02T19:54:30Z",
+            "summary": "Classified as multi-part with 2 parts (frontend, backend)"
+        },
+        {
+            "step": "step_2",
+            "status": "completed",
+            "timestamp": "2026-02-02T19:55:00Z",
+            "summary": "Found 4 existing docs"
+        },
+        {
+            "step": "step_3",
+            "status": "completed",
+            "timestamp": "2026-02-02T19:56:00Z",
+            "summary": "Tech stack analysis complete"
+        },
+        {
+            "step": "step_4",
+            "status": "completed",
+            "timestamp": "2026-02-02T19:58:30Z",
+            "summary": "Detailed scan of API and Data Models complete"
+        },
+        {
+            "step": "step_9",
+            "status": "completed",
+            "timestamp": "2026-02-02T19:59:00Z",
+            "summary": "Generated supporting docs (Overview, Data Models, API, Dev Guide)"
+        },
+        {
+            "step": "step_10",
+            "status": "completed",
+            "timestamp": "2026-02-02T20:00:00Z",
+            "summary": "Master index generated"
+        }
+    ],
+    "current_step": "complete",
+    "findings": {
+        "project_classification": "Multi-part",
+        "generated_files": [
+            "project-overview.md",
+            "source-tree-analysis.md",
+            "data-models.md",
+            "api-contracts.md",
+            "development-guide.md",
+            "index.md"
+        ]
+    },
+    "outputs_generated": [
+        "project-scan-report.json"
+    ],
+    "resume_instructions": "Workflow complete"
+}

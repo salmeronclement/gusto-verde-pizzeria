@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, Navigate, Outlet } from 'react-router-dom';
-import { LayoutDashboard, ShoppingBag, UtensilsCrossed, FileText, Users, Settings, LogOut, Pizza, Palette } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, UtensilsCrossed, FileText, Users, Settings, LogOut, Pizza, Palette, Menu, X } from 'lucide-react';
 import { useAdminStore } from '../../store/useAdminStore';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface AdminLayoutProps {
     children?: React.ReactNode;
@@ -10,6 +11,7 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
     const location = useLocation();
     const { isAuthenticated, logout } = useAdminStore();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // PWA Manifest Injection
     useEffect(() => {
@@ -41,6 +43,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         appleIcon.href = '/admin-icon-192.png';
     }, []);
 
+    // Close mobile menu on route change
+    useEffect(() => {
+        setIsMobileMenuOpen(false);
+    }, [location.pathname]);
+
     // --- SÉCURITÉ ADMIN ---
     if (!isAuthenticated) {
         return <Navigate to="/admin/login" replace />;
@@ -62,54 +69,101 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     ];
 
     return (
-        <div className="min-h-screen bg-cream flex flex-col">
-            {/* Top Navigation Bar - Vert Forêt */}
-            <header className="bg-forest shadow-md z-10 sticky top-0">
-                <div className="w-full px-2 lg:px-4">
-                    <div className="flex justify-between items-center h-14">
-                        {/* Logo */}
-                        <div className="flex-shrink-0 flex items-center">
-                            <span className="text-base font-display font-bold text-white">
-                                Gusto <span className="text-primary">Verde</span>
-                                <span className="ml-1 text-xs font-sans text-cream/70">Admin</span>
-                            </span>
-                        </div>
+        <div className="min-h-screen bg-cream flex">
+            {/* Mobile Sidebar Overlay */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                    />
+                )}
+            </AnimatePresence>
 
-                        {/* Centered Navigation */}
-                        <nav className="hidden lg:flex flex-1 justify-center items-center space-x-2 px-4">
-                            {navItems.map((item) => (
-                                <Link
-                                    key={item.path}
-                                    to={item.path}
-                                    className={`inline-flex items-center px-2.5 py-1.5 rounded text-sm font-medium transition-colors whitespace-nowrap ${isActive(item.path)
-                                        ? 'bg-primary/20 text-primary'
-                                        : 'text-cream/80 hover:text-white hover:bg-white/10'
-                                        }`}
-                                >
-                                    <item.icon size={15} className="mr-1.5" />
-                                    {item.label}
-                                </Link>
-                            ))}
-                        </nav>
+            {/* Sidebar (Desktop & Mobile) */}
+            <motion.aside
+                className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-forest text-white transition-transform lg:translate-x-0 lg:static flex flex-col`}
+                initial={false}
+                animate={{ x: isMobileMenuOpen ? 0 : '-100%' }}
+                // On large screens, we force x: 0 via CSS classes, but here we control mobile state
+                style={{ x: isMobileMenuOpen ? 0 : undefined }} // Reset style on large screens if handled by CSS, but framer-motion might override. 
+            // Better approach with Tailwind responsive classes:
+            // variants={{
+            //     open: { x: 0 },
+            //     closed: { x: '-100%' }
+            // }}
+            // animate={window.innerWidth >= 1024 ? "open" : (isMobileMenuOpen ? "open" : "closed")}
+            // Simpler for now: utilize Tailwind's `lg:translate-x-0` but we need to undo Framer's inline style on LG.
+            >
+                {/* Override Framer Motion style on Large Screens */}
+                <div className={`flex flex-col h-full bg-forest w-64 fixed lg:static top-0 bottom-0 z-50 transition-transform duration-300 transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
 
-                        {/* Logout */}
-                        <div className="flex items-center flex-shrink-0">
-                            <button
-                                onClick={logout}
-                                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 rounded-md transition-colors"
+                    {/* Header Sidebar */}
+                    <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
+                        <span className="text-xl font-display font-bold">
+                            Gusto <span className="text-primary">Verde</span>
+                        </span>
+                        <button
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="lg:hidden p-1 hover:bg-white/10 rounded"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
+
+                    {/* Nav Items */}
+                    <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+                        {navItems.map((item) => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive(item.path)
+                                        ? 'bg-primary text-white shadow-sm'
+                                        : 'text-cream/80 hover:bg-white/10 hover:text-white'
+                                    }`}
                             >
-                                <LogOut size={18} />
-                                <span className="hidden sm:inline">Déconnexion</span>
-                            </button>
-                        </div>
+                                <item.icon size={18} />
+                                {item.label}
+                            </Link>
+                        ))}
+                    </nav>
+
+                    {/* Logout */}
+                    <div className="p-4 border-t border-white/10">
+                        <button
+                            onClick={logout}
+                            className="flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 rounded-lg transition-colors"
+                        >
+                            <LogOut size={18} />
+                            Déconnexion
+                        </button>
                     </div>
                 </div>
-            </header>
+            </motion.aside>
 
-            {/* Main Content */}
-            <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {children || <Outlet />}
-            </main>
+            {/* Main Content Area */}
+            <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 lg:ml-0">
+                {/* Mobile Header */}
+                <header className="lg:hidden bg-forest text-white h-16 flex items-center px-4 shadow-md sticky top-0 z-30">
+                    <button
+                        onClick={() => setIsMobileMenuOpen(true)}
+                        className="p-2 -ml-2 mr-2 hover:bg-white/10 rounded-md"
+                    >
+                        <Menu size={24} />
+                    </button>
+                    <span className="font-display font-bold text-lg">
+                        Admin <span className="text-primary text-sm font-sans ml-2 opacity-80">{navItems.find(i => isActive(i.path))?.label || 'Dashboard'}</span>
+                    </span>
+                </header>
+
+                {/* Content */}
+                <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden">
+                    {children || <Outlet />}
+                </main>
+            </div>
         </div>
     );
 }

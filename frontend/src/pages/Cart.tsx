@@ -111,7 +111,7 @@ export const Cart: React.FC = () => {
     return (
         <div className="min-h-screen bg-gray-50 py-10">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h1 className="font-display text-5xl font-bold text-dark mb-10">
+                <h1 className="font-display text-3xl md:text-5xl font-bold text-dark mb-6 md:mb-10 text-center md:text-left">
                     Votre Panier
                 </h1>
 
@@ -201,7 +201,7 @@ export const Cart: React.FC = () => {
                 )}
 
                 <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-8">
-                    <div className="p-6 sm:p-8">
+                    <div className="p-4 sm:p-8">
                         {/* Cart Items */}
                         <div className="space-y-6">
                             {items.map((item, index) => {
@@ -319,13 +319,13 @@ export const Cart: React.FC = () => {
                     </div>
 
                     {/* Total */}
-                    <div className="bg-primary rounded-2xl p-8 mb-8 shadow-lg">
+                    <div className="bg-primary rounded-2xl p-6 md:p-8 mb-8 shadow-lg">
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
-                                <span className="font-display text-3xl font-bold text-white">
+                                <span className="font-display text-2xl md:text-3xl font-bold text-white">
                                     Total
                                 </span>
-                                <span className="font-display text-5xl font-bold text-white">
+                                <span className="font-display text-3xl md:text-5xl font-bold text-white">
                                     {formatPrice(total)}
                                 </span>
                             </div>

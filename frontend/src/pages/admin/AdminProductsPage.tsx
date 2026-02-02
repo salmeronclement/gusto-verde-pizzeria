@@ -147,7 +147,7 @@ export default function AdminProductsPage() {
                 </button>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
                 <table className="w-full">
                     <thead className="bg-gray-50 border-b border-gray-100">
                         <tr>
@@ -231,8 +231,8 @@ export default function AdminProductsPage() {
                         </div>
 
                         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                            <div className="flex gap-6">
-                                <div className="w-1/3">
+                            <div className="flex flex-col md:flex-row gap-6">
+                                <div className="w-full md:w-1/3">
                                     <label className="block text-sm font-bold text-gray-700 mb-2">Image</label>
                                     <div className="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center relative overflow-hidden bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
                                         {previewUrl ? (
@@ -252,7 +252,7 @@ export default function AdminProductsPage() {
                                     </div>
                                 </div>
 
-                                <div className="w-2/3 space-y-4">
+                                <div className="w-full md:w-2/3 space-y-4">
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1">Nom du produit</label>
                                         <input

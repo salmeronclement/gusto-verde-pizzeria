@@ -78,7 +78,7 @@ const AdminOrdersPage: React.FC = () => {
           if (newOrders.length > 0) {
             // Play Sound
             if (alertEnabled) {
-              // audioRef.current?.play().catch(e => console.warn("Audio blocked:", e)); // Sound disabled by user request
+              audioRef.current?.play().catch(e => console.warn("Audio blocked:", e));
               // Popup popus if single new order
               if (newOrders.length === 1) {
                 setSelectedOrder(newOrders[0]);

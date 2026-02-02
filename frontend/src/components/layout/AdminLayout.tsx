@@ -121,8 +121,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                                 key={item.path}
                                 to={item.path}
                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive(item.path)
-                                        ? 'bg-primary text-white shadow-sm'
-                                        : 'text-cream/80 hover:bg-white/10 hover:text-white'
+                                    ? 'bg-primary text-white shadow-sm'
+                                    : 'text-cream/80 hover:bg-white/10 hover:text-white'
                                     }`}
                             >
                                 <item.icon size={18} />
@@ -155,7 +155,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                         <Menu size={24} />
                     </button>
                     <span className="font-display font-bold text-lg">
-                        Admin <span className="text-primary text-sm font-sans ml-2 opacity-80">{navItems.find(i => isActive(i.path))?.label || 'Dashboard'}</span>
+                        ADMIN MOBILE <span className="text-primary text-sm font-sans ml-2 opacity-80">{navItems.find(i => isActive(i.path))?.label || 'Dashboard'}</span>
                     </span>
                 </header>
 

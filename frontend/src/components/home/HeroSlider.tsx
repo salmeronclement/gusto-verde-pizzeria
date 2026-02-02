@@ -55,7 +55,7 @@ export default function HeroSlider() {
      ========================= */
   if (loading) {
     return (
-      <section className="relative h-[600px] md:h-[700px] bg-cream flex items-center justify-center">
+      <section className="relative h-[450px] md:h-[700px] bg-cream flex items-center justify-center">
         <Loader2 className="w-12 h-12 animate-spin text-primary" />
       </section>
     )
@@ -66,7 +66,7 @@ export default function HeroSlider() {
      ========================= */
   if (slides.length === 0) {
     return (
-      <section className="relative h-[600px] md:h-[700px] bg-forest flex items-center">
+      <section className="relative h-[450px] md:h-[700px] bg-forest flex items-center">
         <div className="container-custom">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -141,7 +141,7 @@ export default function HeroSlider() {
         navigation
         pagination={{ clickable: true }}
         loop
-        className="h-[600px] md:h-[700px]"
+        className="h-[450px] md:h-[700px]"
       >
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>

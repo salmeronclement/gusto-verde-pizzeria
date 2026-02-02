@@ -155,7 +155,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                         <Menu size={24} />
                     </button>
                     <span className="font-display font-bold text-lg">
-                        ADMIN MOBILE <span className="text-primary text-sm font-sans ml-2 opacity-80">{navItems.find(i => isActive(i.path))?.label || 'Dashboard'}</span>
+                        Admin <span className="text-primary text-sm font-sans ml-2 opacity-80">{navItems.find(i => isActive(i.path))?.label || 'Dashboard'}</span>
                     </span>
                 </header>
 

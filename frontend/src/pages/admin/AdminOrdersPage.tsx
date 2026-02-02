@@ -206,7 +206,7 @@ const AdminOrdersPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <ShoppingBag className="text-green-600" size={24} />
           <h1 className="text-xl font-bold text-gray-800 flex items-center gap-3">
-            Commandes en cours (v2.0)
+            Commandes en cours
             <span className="text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
               {orders.length}
             </span>

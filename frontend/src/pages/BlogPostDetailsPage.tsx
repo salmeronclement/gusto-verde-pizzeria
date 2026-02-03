@@ -64,7 +64,7 @@ export default function BlogPostDetailsPage() {
             <div className="min-h-screen bg-cream">
                 <div className="bg-forest py-16">
                     <div className="container-custom text-center">
-                        <h1 className="text-4xl font-display font-bold text-white mb-4">Article non trouvé</h1>
+                        <h2 className="text-4xl font-display font-bold text-white mb-4">Article non trouvé</h2>
                     </div>
                 </div>
                 <div className="container-custom py-16 text-center">
@@ -100,7 +100,7 @@ export default function BlogPostDetailsPage() {
             {!post.image_url && (
                 <div className="bg-forest py-16">
                     <div className="container-custom text-center">
-                        <h1 className="text-3xl md:text-4xl font-display font-bold text-white mb-4">{post.title}</h1>
+                        <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4">{post.title}</h2>
                     </div>
                 </div>
             )}

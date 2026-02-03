@@ -47,11 +47,13 @@ export default function Avantages() {
             <img
                 src={tomatoImg}
                 alt=""
+                aria-hidden="true"
                 className="absolute top-10 left-10 w-16 opacity-20 rotate-12"
             />
             <img
                 src={tomatoImg}
                 alt=""
+                aria-hidden="true"
                 className="absolute bottom-10 right-10 w-16 opacity-20 -rotate-12"
             />
 

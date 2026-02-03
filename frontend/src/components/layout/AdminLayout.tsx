@@ -84,68 +84,54 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </AnimatePresence>
 
             {/* Sidebar (Desktop & Mobile) */}
-            <motion.aside
-                className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-forest text-white transition-transform lg:translate-x-0 lg:static flex flex-col`}
-                initial={false}
-                animate={{ x: isMobileMenuOpen ? 0 : '-100%' }}
-                // On large screens, we force x: 0 via CSS classes, but here we control mobile state
-                style={{ x: isMobileMenuOpen ? 0 : undefined }} // Reset style on large screens if handled by CSS, but framer-motion might override. 
-            // Better approach with Tailwind responsive classes:
-            // variants={{
-            //     open: { x: 0 },
-            //     closed: { x: '-100%' }
-            // }}
-            // animate={window.innerWidth >= 1024 ? "open" : (isMobileMenuOpen ? "open" : "closed")}
-            // Simpler for now: utilize Tailwind's `lg:translate-x-0` but we need to undo Framer's inline style on LG.
+            <aside
+                className={`fixed lg:static top-0 left-0 bottom-0 z-50 w-64 bg-forest text-white flex flex-col transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+                    } lg:translate-x-0`}
             >
-                {/* Override Framer Motion style on Large Screens */}
-                <div className={`flex flex-col h-full bg-forest w-64 fixed lg:static top-0 bottom-0 z-50 transition-transform duration-300 transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-
-                    {/* Header Sidebar */}
-                    <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
-                        <span className="text-xl font-display font-bold">
-                            Gusto <span className="text-primary">Verde</span>
-                        </span>
-                        <button
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="lg:hidden p-1 hover:bg-white/10 rounded"
-                        >
-                            <X size={20} />
-                        </button>
-                    </div>
-
-                    {/* Nav Items */}
-                    <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-                        {navItems.map((item) => (
-                            <Link
-                                key={item.path}
-                                to={item.path}
-                                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive(item.path)
-                                    ? 'bg-primary text-white shadow-sm'
-                                    : 'text-cream/80 hover:bg-white/10 hover:text-white'
-                                    }`}
-                            >
-                                <item.icon size={18} />
-                                {item.label}
-                            </Link>
-                        ))}
-                    </nav>
-
-                    {/* Logout */}
-                    <div className="p-4 border-t border-white/10">
-                        <button
-                            onClick={logout}
-                            className="flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 rounded-lg transition-colors"
-                        >
-                            <LogOut size={18} />
-                            Déconnexion
-                        </button>
-                    </div>
+                {/* Header Sidebar */}
+                <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
+                    <span className="text-xl font-display font-bold">
+                        Gusto <span className="text-primary">Verde</span>
+                    </span>
+                    <button
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="lg:hidden p-1 hover:bg-white/10 rounded"
+                    >
+                        <X size={20} />
+                    </button>
                 </div>
-            </motion.aside>
+
+                {/* Nav Items */}
+                <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+                    {navItems.map((item) => (
+                        <Link
+                            key={item.path}
+                            to={item.path}
+                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive(item.path)
+                                ? 'bg-primary text-white shadow-sm'
+                                : 'text-cream/80 hover:bg-white/10 hover:text-white'
+                                }`}
+                        >
+                            <item.icon size={18} />
+                            {item.label}
+                        </Link>
+                    ))}
+                </nav>
+
+                {/* Logout */}
+                <div className="p-4 border-t border-white/10">
+                    <button
+                        onClick={logout}
+                        className="flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium text-red-300 hover:text-red-200 hover:bg-red-500/20 rounded-lg transition-colors"
+                    >
+                        <LogOut size={18} />
+                        Déconnexion
+                    </button>
+                </div>
+            </aside>
 
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 lg:ml-0">
+            <div className="flex-1 flex flex-col min-w-0">
                 {/* Mobile Header */}
                 <header className="lg:hidden bg-forest text-white h-16 flex items-center px-4 shadow-md sticky top-0 z-30">
                     <button

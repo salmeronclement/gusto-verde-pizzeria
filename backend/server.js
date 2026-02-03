@@ -43,6 +43,7 @@ app.use('/api/admin/deliveries', verifyAdminToken, adminDeliveriesRoutes);
 app.use('/api/admin/stats', verifyAdminToken, adminStatsRoutes);
 app.use('/api/admin/products', verifyAdminToken, adminProductsRoutes);
 app.use('/api/blog', require('./routes/blogRoutes'));
+app.use('/api/settings', adminSettingsRoutes); // Public access to /public endpoint
 app.use('/api/admin/settings', adminSettingsRoutes);
 app.use('/api/admin/customers', verifyAdminToken, require('./routes/adminCustomersRoutes'));
 app.use('/api/admin/service', require('./routes/adminServiceRoutes'));

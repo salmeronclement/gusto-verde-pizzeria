@@ -162,7 +162,7 @@ export default function HeroSlider() {
               <img
                 src={slide.image_url}
                 alt={slide.title || 'Hero slide'}
-                className="absolute inset-0 w-full h-full object-cover object-center"
+                className="absolute inset-0 w-full h-full min-w-full min-h-full object-cover object-center"
               />
 
               {/* Overlay */}

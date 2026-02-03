@@ -5,7 +5,6 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import 'swiper/css/effect-fade'
-import { motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 
 interface HeroSlide {
@@ -68,12 +67,7 @@ export default function HeroSlider() {
     return (
       <section className="relative h-[50vh] min-h-[400px] md:h-[700px] bg-forest flex items-center">
         <div className="container-custom">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-3xl"
-          >
+          <div className="max-w-3xl">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-white mb-6">
               Bienvenue chez <br />
               <span className="text-primary">Gusto Verde</span>
@@ -89,7 +83,7 @@ export default function HeroSlider() {
             >
               Découvrir la carte
             </a>
-          </motion.div>
+          </div>
         </div>
       </section>
     )
@@ -166,10 +160,7 @@ export default function HeroSlider() {
             {({ isActive }) => (
               <div className="relative h-full w-full overflow-hidden">
                 {/* Background image */}
-                <motion.div
-                  initial={{ scale: 1.2 }}
-                  animate={{ scale: isActive ? 1 : 1.2 }}
-                  transition={{ duration: 8, ease: 'easeOut' }}
+                <div
                   className="absolute inset-0 bg-cover bg-center"
                   style={{ backgroundImage: `url(${slide.image_url})` }}
                 />

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { useSettingsStore } from '../store/useSettingsStore';
+import SEO from '../components/seo/SEO';
 
 export default function ContactPage() {
     const { settings, fetchPublicSettings } = useSettingsStore();
@@ -17,6 +18,11 @@ export default function ContactPage() {
 
     return (
         <div className="min-h-screen bg-white">
+            <SEO
+                title="Nous Contacter - Gusto Verde Marseille"
+                description="Une question ? Envie de réserver ? Contactez l'équipe de Gusto Verde à Marseille. Téléphone, adresse et horaires."
+                canonicalUrl="/contact"
+            />
             {/* Page Header */}
             <div className="bg-dark py-16">
                 <div className="container-custom text-center">

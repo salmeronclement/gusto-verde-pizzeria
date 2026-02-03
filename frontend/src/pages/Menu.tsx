@@ -8,6 +8,7 @@ import { useSettingsStore } from '../store/useSettingsStore';
 import { Product } from '../types';
 import { getProducts, getImageUrl } from '../services/api';
 import LoyaltyRewardCard from '../components/LoyaltyRewardCard';
+import SEO from '../components/seo/SEO';
 
 const Menu: React.FC = () => {
     const navigate = useNavigate();
@@ -113,6 +114,11 @@ const Menu: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 pt-12">
+            <SEO
+                title="Notre Carte - Pizzas Authentiques | Gusto Verde"
+                description="Parcourez notre carte de pizzas artisanales : Margherita, Reine, 4 Fromages... Préparées avec amour et des ingrédients de qualité."
+                canonicalUrl="/nos-pizzas"
+            />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-8">
                     <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-dark mb-4">

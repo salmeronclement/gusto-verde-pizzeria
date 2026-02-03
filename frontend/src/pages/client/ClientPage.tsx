@@ -8,6 +8,7 @@ import { Package, Clock, LogOut, User as UserIcon, MapPin, Edit2, Save, X, Plus,
 import { Link, useNavigate } from 'react-router-dom';
 import LoyaltyRewardCard from '../../components/LoyaltyRewardCard';
 import { Product } from '../../types';
+import SEO from '../../components/seo/SEO';
 
 export default function ClientPage() {
     const [apiOrders, setApiOrders] = useState<any[]>([]);
@@ -134,6 +135,12 @@ export default function ClientPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-12">
+            <SEO
+                title="Mon Espace Fidélité | Gusto Verde"
+                description="Gérez vos commandes et consultez vos points de fidélité Gusto Verde."
+                canonicalUrl="/mon-compte"
+                noIndex={true}
+            />
             {/* Header Profil */}
             <div className="bg-white border-b border-gray-200">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

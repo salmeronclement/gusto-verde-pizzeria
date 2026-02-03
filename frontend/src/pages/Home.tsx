@@ -1,10 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Star, Clock, MapPin, Phone } from 'lucide-react';
+import SEO from '../components/seo/SEO';
+import StructuredData from '../components/seo/StructuredData';
 
 const Home = () => {
   return (
     <div className="flex flex-col min-h-screen">
+      <SEO
+        title="Gusto Verde - Pizzeria Italienne Authentique à Marseille"
+        description="Découvrez Gusto Verde, la meilleure pizzeria de Marseille. Pizzas au feu de bois, produits frais italiens et livraison rapide. Commandez en ligne dès maintenant !"
+        canonicalUrl="/"
+      />
+      <StructuredData />
 
       {/* SECTION HERO (Bannière) */}
       <section className="relative h-[80vh] flex items-center justify-center bg-gray-900 overflow-hidden">

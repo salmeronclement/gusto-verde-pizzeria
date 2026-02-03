@@ -157,12 +157,11 @@ export default function HeroSlider() {
       >
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
-            <div className="relative h-full w-full overflow-hidden">
-              {/* Background image - using img tag for better responsive behavior */}
-              <img
-                src={slide.image_url}
-                alt={slide.title || 'Hero slide'}
-                className="absolute inset-0 w-full h-full min-w-full min-h-full object-cover object-center"
+            <div className="relative h-full w-full">
+              {/* Background image with cover */}
+              <div
+                className="absolute inset-0 w-full h-full bg-cover bg-center"
+                style={{ backgroundImage: `url(${slide.image_url})` }}
               />
 
               {/* Overlay */}

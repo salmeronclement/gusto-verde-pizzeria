@@ -157,44 +157,43 @@ export default function HeroSlider() {
       >
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
-            {({ isActive }) => (
-              <div className="relative h-full w-full overflow-hidden">
-                {/* Background image */}
-                <div
-                  className="absolute inset-0 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${slide.image_url})` }}
-                />
+            <div className="relative h-full w-full overflow-hidden">
+              {/* Background image - using img tag for better responsive behavior */}
+              <img
+                src={slide.image_url}
+                alt={slide.title || 'Hero slide'}
+                className="absolute inset-0 w-full h-full object-cover object-center"
+              />
 
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-black/40" />
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-black/40" />
 
-                {/* Content */}
-                <div className="container-custom h-full relative z-10 flex items-center">
-                  <div className="max-w-3xl">
-                    {(slide.title || slide.subtitle) && (
-                      <h2 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-white mb-6">
-                        {slide.title}
-                        {slide.subtitle && (
-                          <>
-                            <br />
-                            <span className="text-primary text-2xl md:text-4xl">
-                              {slide.subtitle}
-                            </span>
-                          </>
-                        )}
-                      </h2>
-                    )}
+              {/* Content */}
+              <div className="container-custom h-full relative z-10 flex items-center">
+                <div className="max-w-3xl">
+                  {(slide.title || slide.subtitle) && (
+                    <h2 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-white mb-6">
+                      {slide.title}
+                      {slide.subtitle && (
+                        <>
+                          <br />
+                          <span className="text-primary text-2xl md:text-4xl">
+                            {slide.subtitle}
+                          </span>
+                        </>
+                      )}
+                    </h2>
+                  )}
 
-                    <a
-                      href="/menu"
-                      className="inline-block bg-primary hover:bg-accent text-white font-bold text-base px-6 py-3 md:text-lg md:px-8 md:py-4 rounded-full transition-all hover:scale-105"
-                    >
-                      Commander maintenant
-                    </a>
-                  </div>
+                  <a
+                    href="/menu"
+                    className="inline-block bg-primary hover:bg-accent text-white font-bold text-base px-6 py-3 md:text-lg md:px-8 md:py-4 rounded-full transition-all hover:scale-105"
+                  >
+                    Commander maintenant
+                  </a>
                 </div>
               </div>
-            )}
+            </div>
           </SwiperSlide>
         ))}
       </Swiper>

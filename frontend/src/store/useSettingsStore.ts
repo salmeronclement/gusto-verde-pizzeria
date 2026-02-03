@@ -63,14 +63,13 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
     loading: false,
 
     fetchPublicSettings: async () => {
-        // Check if we should use cached data
         const cachedData = localStorage.getItem('pizzeria-settings');
         const cacheTimestamp = localStorage.getItem('pizzeria-settings-timestamp');
         const now = Date.now();
-        const TEN_MINUTES = 10 * 60 * 1000; // 10 minutes in milliseconds
+        const ONE_MINUTE = 1 * 60 * 1000; // 1 minute in milliseconds
 
-        // If cache exists and is less than 10 minutes old, use it
-        if (cachedData && cacheTimestamp && (now - parseInt(cacheTimestamp)) < TEN_MINUTES) {
+        // If cache exists and is less than 1 minute old, use it
+        if (cachedData && cacheTimestamp && (now - parseInt(cacheTimestamp)) < ONE_MINUTE) {
             try {
                 const parsed = JSON.parse(cachedData);
                 set({ settings: parsed, loading: false });

@@ -63,14 +63,36 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
     loading: false,
 
     fetchPublicSettings: async () => {
+        // Check if we should use cached data
+        const cachedData = localStorage.getItem('pizzeria-settings');
+        const cacheTimestamp = localStorage.getItem('pizzeria-settings-timestamp');
+        const now = Date.now();
+        const TEN_MINUTES = 10 * 60 * 1000; // 10 minutes in milliseconds
+
+        // If cache exists and is less than 10 minutes old, use it
+        if (cachedData && cacheTimestamp && (now - parseInt(cacheTimestamp)) < TEN_MINUTES) {
+            try {
+                const parsed = JSON.parse(cachedData);
+                set({ settings: parsed, loading: false });
+                console.log('✅ [Frontend Store] Using cached settings');
+                return;
+            } catch (e) {
+                // If cache is corrupted, continue to fetch fresh data
+                console.warn('⚠️ Cache corrupted, fetching fresh data');
+            }
+        }
+
+        // Fetch fresh data
         set({ loading: true });
         try {
             const data = await getPublicSettings();
             console.log('✅ [Frontend Store] Settings chargés:', data);
             console.log('🎁 [Frontend Store] loyalty_program:', data.loyalty_program);
+            console.log('📞 [Frontend Store] contact_info:', data.contact_info);
 
-            // IMPORTANT : On sauvegarde dans localStorage pour que useCartStore puisse y accéder synchrone
+            // Save to localStorage with timestamp
             localStorage.setItem('pizzeria-settings', JSON.stringify(data));
+            localStorage.setItem('pizzeria-settings-timestamp', now.toString());
 
             set({ settings: data, loading: false });
         } catch (error) {
